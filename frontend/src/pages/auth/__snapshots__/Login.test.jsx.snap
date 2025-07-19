@@ -1,0 +1,495 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Login Page matches snapshot in light and dark mode: dark-mode 1`] = `
+<DocumentFragment>
+  <div
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden"
+  >
+    <div
+      class="absolute bottom-0 left-0 w-48 h-48 bg-maroon/20 blur-3xl rounded-full z-0 animate-fade-in"
+    />
+    <div
+      class="absolute inset-0 opacity-5 dark:opacity-10 z-0"
+    >
+      <div
+        class="absolute top-0 left-0 w-96 h-96 bg-primary rounded-full mix-blend-multiply filter blur-xl animate-pulse"
+      />
+      <div
+        class="absolute top-0 right-0 w-96 h-96 bg-accent rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"
+      />
+      <div
+        class="absolute -bottom-8 left-20 w-72 h-72 bg-maroon rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"
+      />
+    </div>
+    <div
+      class="absolute top-8 right-8 opacity-20 dark:opacity-30 animate-islamic-rotate z-0"
+    >
+      <svg
+        class="text-primary"
+        height="120"
+        viewBox="0 0 120 120"
+        width="120"
+      >
+        <defs>
+          <pattern
+            height="40"
+            id="islamic-pattern"
+            patternUnits="userSpaceOnUse"
+            width="40"
+            x="0"
+            y="0"
+          >
+            <path
+              d="M20 0L24 16L40 20L24 24L20 40L16 24L0 20L16 16Z"
+              fill="currentColor"
+              opacity="0.3"
+            />
+          </pattern>
+        </defs>
+        <rect
+          fill="url(#islamic-pattern)"
+          height="120"
+          width="120"
+        />
+      </svg>
+    </div>
+    <div
+      class="relative z-10 w-full max-w-[400px] mx-auto px-6 py-8"
+    >
+      <div
+        class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/20 px-6 py-8 space-y-8"
+      >
+        <div
+          class="text-center space-y-4"
+        >
+          <div
+            class="flex justify-center"
+          >
+            <div
+              class="relative animate-float transition-all duration-500 hover:scale-105 shadow-[0_0_12px_rgba(26,127,85,0.6)]"
+            >
+              <img
+                alt="Mawaddah Logo"
+                class="h-16 w-16 rounded-xl object-contain mx-auto select-none"
+                draggable="false"
+                src="/ic_mawaddah_180x180.png"
+              />
+              <div
+                class="absolute -inset-1 bg-gradient-to-r from-accent to-primary rounded-2xl opacity-20 blur-sm pointer-events-none"
+              />
+            </div>
+          </div>
+          <div
+            class="space-y-2"
+          >
+            <h1
+              class="text-2xl font-bold text-gray-900 dark:text-gray-100 text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"
+            >
+              Mawaddah
+            </h1>
+            <p
+              class="text-sm text-gray-500 dark:text-gray-400 text-center"
+            >
+              Admin Dashboard
+            </p>
+          </div>
+        </div>
+        <div
+          class="text-center space-y-2"
+        >
+          <h2
+            class="text-lg font-semibold text-gray-900 dark:text-gray-100 text-gray-900 dark:text-gray-100"
+          >
+            Welcome Back
+          </h2>
+          <p
+            class="text-base text-gray-500 dark:text-gray-400 text-sm"
+          >
+            Sign in to your account to continue
+          </p>
+        </div>
+        <form
+          class="space-y-6"
+        >
+          <div
+            class="space-y-4"
+          >
+            <div
+              class="w-full"
+            >
+              <label
+                class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+                for="email"
+              >
+                Email Address
+              </label>
+              <input
+                class="
+          w-full rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200
+          px-4 py-2
+          border-gray-300 dark:border-gray-700
+          
+        "
+                id="email"
+                placeholder="Enter your email"
+                required=""
+                type="email"
+                value=""
+              />
+            </div>
+            <div
+              class="w-full"
+            >
+              <label
+                class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+                for="password"
+              >
+                Password
+              </label>
+              <input
+                class="
+          w-full rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200
+          px-4 py-2
+          border-gray-300 dark:border-gray-700
+          
+        "
+                id="password"
+                placeholder="Enter your password"
+                required=""
+                type="password"
+                value=""
+              />
+            </div>
+          </div>
+          <div
+            class="flex items-center justify-between"
+          >
+            <label
+              class="flex items-center space-x-2 cursor-pointer"
+            >
+              <input
+                class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2"
+                type="checkbox"
+              />
+              <p
+                class="text-sm text-gray-700 dark:text-gray-300 text-gray-700 dark:text-gray-300"
+              >
+                Remember me
+              </p>
+            </label>
+            <a
+              class="text-sm text-primary hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 transition-colors duration-200"
+              to="/forgot-password"
+            >
+              Forgot password?
+            </a>
+          </div>
+          <button
+            class="font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-green-600 hover:bg-green-700 text-white focus:ring-green-500/50 dark:bg-green-600 dark:hover:bg-green-700 px-6 py-3 text-lg w-full hover:scale-105 transition-transform duration-200 hover:shadow-inner"
+            type="submit"
+          >
+            Sign In
+          </button>
+        </form>
+        <div
+          class="text-center pt-4 border-t border-gray-200 dark:border-gray-700"
+        >
+          <p
+            class="text-center text-sm mt-6 italic text-gray-400"
+            dir="rtl"
+            lang="ar"
+          >
+            إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ
+          </p>
+          <p
+            class="text-xs text-gray-500 dark:text-gray-400 mt-1"
+          >
+            "Indeed, the believers are brothers"
+          </p>
+        </div>
+      </div>
+      <div
+        class="absolute -bottom-4 -left-4 opacity-20 dark:opacity-30 z-0"
+      >
+        <svg
+          class="text-accent"
+          height="80"
+          viewBox="0 0 80 80"
+          width="80"
+        >
+          <defs>
+            <pattern
+              height="20"
+              id="bottom-pattern"
+              patternUnits="userSpaceOnUse"
+              width="20"
+              x="0"
+              y="0"
+            >
+              <circle
+                cx="10"
+                cy="10"
+                fill="currentColor"
+                opacity="0.4"
+                r="2"
+              />
+            </pattern>
+          </defs>
+          <rect
+            fill="url(#bottom-pattern)"
+            height="80"
+            width="80"
+          />
+        </svg>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Login Page matches snapshot in light and dark mode: light-mode 1`] = `
+<DocumentFragment>
+  <div
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden"
+  >
+    <div
+      class="absolute bottom-0 left-0 w-48 h-48 bg-maroon/20 blur-3xl rounded-full z-0 animate-fade-in"
+    />
+    <div
+      class="absolute inset-0 opacity-5 dark:opacity-10 z-0"
+    >
+      <div
+        class="absolute top-0 left-0 w-96 h-96 bg-primary rounded-full mix-blend-multiply filter blur-xl animate-pulse"
+      />
+      <div
+        class="absolute top-0 right-0 w-96 h-96 bg-accent rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"
+      />
+      <div
+        class="absolute -bottom-8 left-20 w-72 h-72 bg-maroon rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"
+      />
+    </div>
+    <div
+      class="absolute top-8 right-8 opacity-20 dark:opacity-30 animate-islamic-rotate z-0"
+    >
+      <svg
+        class="text-primary"
+        height="120"
+        viewBox="0 0 120 120"
+        width="120"
+      >
+        <defs>
+          <pattern
+            height="40"
+            id="islamic-pattern"
+            patternUnits="userSpaceOnUse"
+            width="40"
+            x="0"
+            y="0"
+          >
+            <path
+              d="M20 0L24 16L40 20L24 24L20 40L16 24L0 20L16 16Z"
+              fill="currentColor"
+              opacity="0.3"
+            />
+          </pattern>
+        </defs>
+        <rect
+          fill="url(#islamic-pattern)"
+          height="120"
+          width="120"
+        />
+      </svg>
+    </div>
+    <div
+      class="relative z-10 w-full max-w-[400px] mx-auto px-6 py-8"
+    >
+      <div
+        class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/20 px-6 py-8 space-y-8"
+      >
+        <div
+          class="text-center space-y-4"
+        >
+          <div
+            class="flex justify-center"
+          >
+            <div
+              class="relative animate-float transition-all duration-500 hover:scale-105 shadow-[0_0_12px_rgba(26,127,85,0.6)]"
+            >
+              <img
+                alt="Mawaddah Logo"
+                class="h-16 w-16 rounded-xl object-contain mx-auto select-none"
+                draggable="false"
+                src="/ic_mawaddah_180x180.png"
+              />
+              <div
+                class="absolute -inset-1 bg-gradient-to-r from-accent to-primary rounded-2xl opacity-20 blur-sm pointer-events-none"
+              />
+            </div>
+          </div>
+          <div
+            class="space-y-2"
+          >
+            <h1
+              class="text-2xl font-bold text-gray-900 dark:text-gray-100 text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"
+            >
+              Mawaddah
+            </h1>
+            <p
+              class="text-sm text-gray-500 dark:text-gray-400 text-center"
+            >
+              Admin Dashboard
+            </p>
+          </div>
+        </div>
+        <div
+          class="text-center space-y-2"
+        >
+          <h2
+            class="text-lg font-semibold text-gray-900 dark:text-gray-100 text-gray-900 dark:text-gray-100"
+          >
+            Welcome Back
+          </h2>
+          <p
+            class="text-base text-gray-500 dark:text-gray-400 text-sm"
+          >
+            Sign in to your account to continue
+          </p>
+        </div>
+        <form
+          class="space-y-6"
+        >
+          <div
+            class="space-y-4"
+          >
+            <div
+              class="w-full"
+            >
+              <label
+                class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+                for="email"
+              >
+                Email Address
+              </label>
+              <input
+                class="
+          w-full rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200
+          px-4 py-2
+          border-gray-300 dark:border-gray-700
+          
+        "
+                id="email"
+                placeholder="Enter your email"
+                required=""
+                type="email"
+                value=""
+              />
+            </div>
+            <div
+              class="w-full"
+            >
+              <label
+                class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+                for="password"
+              >
+                Password
+              </label>
+              <input
+                class="
+          w-full rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200
+          px-4 py-2
+          border-gray-300 dark:border-gray-700
+          
+        "
+                id="password"
+                placeholder="Enter your password"
+                required=""
+                type="password"
+                value=""
+              />
+            </div>
+          </div>
+          <div
+            class="flex items-center justify-between"
+          >
+            <label
+              class="flex items-center space-x-2 cursor-pointer"
+            >
+              <input
+                class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2"
+                type="checkbox"
+              />
+              <p
+                class="text-sm text-gray-700 dark:text-gray-300 text-gray-700 dark:text-gray-300"
+              >
+                Remember me
+              </p>
+            </label>
+            <a
+              class="text-sm text-primary hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 transition-colors duration-200"
+              to="/forgot-password"
+            >
+              Forgot password?
+            </a>
+          </div>
+          <button
+            class="font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-green-600 hover:bg-green-700 text-white focus:ring-green-500/50 dark:bg-green-600 dark:hover:bg-green-700 px-6 py-3 text-lg w-full hover:scale-105 transition-transform duration-200 hover:shadow-inner"
+            type="submit"
+          >
+            Sign In
+          </button>
+        </form>
+        <div
+          class="text-center pt-4 border-t border-gray-200 dark:border-gray-700"
+        >
+          <p
+            class="text-center text-sm mt-6 italic text-gray-400"
+            dir="rtl"
+            lang="ar"
+          >
+            إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ
+          </p>
+          <p
+            class="text-xs text-gray-500 dark:text-gray-400 mt-1"
+          >
+            "Indeed, the believers are brothers"
+          </p>
+        </div>
+      </div>
+      <div
+        class="absolute -bottom-4 -left-4 opacity-20 dark:opacity-30 z-0"
+      >
+        <svg
+          class="text-accent"
+          height="80"
+          viewBox="0 0 80 80"
+          width="80"
+        >
+          <defs>
+            <pattern
+              height="20"
+              id="bottom-pattern"
+              patternUnits="userSpaceOnUse"
+              width="20"
+              x="0"
+              y="0"
+            >
+              <circle
+                cx="10"
+                cy="10"
+                fill="currentColor"
+                opacity="0.4"
+                r="2"
+              />
+            </pattern>
+          </defs>
+          <rect
+            fill="url(#bottom-pattern)"
+            height="80"
+            width="80"
+          />
+        </svg>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply transition-colors duration-200;
+  }
+  
+  body {
+    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+  }
+}
+
+@layer components {
+  /* Custom scrollbar for webkit browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-500;
+  }
+}
+
+/* Focus styles for better accessibility */
+@layer utilities {
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-900;
+  }
+  
+  /* Override browser autofill styling */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px rgba(248, 246, 240, 0.8) inset !important;
+    -webkit-text-fill-color: #1f2937 !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+  
+  /* For Firefox */
+  input:-moz-autofill {
+    background-color: rgba(248, 246, 240, 0.8) !important;
+    color: #1f2937 !important;
+  }
+}
+
+/* Custom animations for login page */
+@layer utilities {
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+  
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+  
+  /* Islamic pattern animation */
+  @keyframes islamic-rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .animate-islamic-rotate {
+    animation: islamic-rotate 20s linear infinite;
+  }
+  
+  /* Subtle pulse for spiritual elements */
+  @keyframes spiritual-pulse {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.05);
+    }
+  }
+  
+  .animate-spiritual-pulse {
+    animation: spiritual-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  .animate-fade-in {
+    animation: fade-in 2s ease-in;
+  }
+} 
+
+/* --- Autofill background fix: force custom style for all browsers --- */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  background-color: rgba(248, 246, 240, 0.8) !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(248, 246, 240, 0.8) inset !important;
+  -webkit-text-fill-color: #1f2937 !important;
+  color: #1f2937 !important;
+  border-radius: 0.5rem !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+input:-moz-autofill {
+  background-color: rgba(248, 246, 240, 0.8) !important;
+  color: #1f2937 !important;
+  border-radius: 0.5rem !important;
+} 
+
+/* --- Aggressive autofill background fix for all browsers --- */
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active {
+  background-color: rgba(248, 246, 240, 0.8) !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(248, 246, 240, 0.8) inset !important;
+  box-shadow: 0 0 0 1000px rgba(248, 246, 240, 0.8) inset !important;
+  -webkit-text-fill-color: #1f2937 !important;
+  color: #1f2937 !important;
+  border-radius: 0.5rem !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+} 

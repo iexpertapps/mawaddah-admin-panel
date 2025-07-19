@@ -1,0 +1,630 @@
+{
+  "info": {
+    "_postman_id": "mawaddah-admin-api-collection",
+    "name": "Mawaddah Admin API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Complete Postman collection for Mawaddah Admin Dashboard API. Includes authentication, users, appeals, donations, wallet, and dashboard endpoints. Token authentication required for all endpoints except login."
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints for login and logout",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const responseJson = pm.response.json();",
+                  "    if (responseJson.token) {",
+                  "        pm.environment.set('token', responseJson.token);",
+                  "        console.log('Token saved to environment');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@mawaddah.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login with email and password. Returns a token that will be automatically saved to the environment variable 'token'."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/logout/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Logout the current user. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get the current authenticated user's profile."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "User management endpoints",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            },
+            "description": "List all users. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Shura Members",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/?role=shura",
+              "host": ["{{base_url}}"],
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "shura"
+                }
+              ]
+            },
+            "description": "List all users with Shura role. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/:id/",
+              "host": ["{{base_url}}"],
+              "path": ["users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "User ID"
+                }
+              ]
+            },
+            "description": "Get a specific user by ID. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Updated Name\",\n  \"last_name\": \"Updated Last\",\n  \"email\": \"updated@example.com\",\n  \"role\": \"user\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/:id/",
+              "host": ["{{base_url}}"],
+              "path": ["users", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "User ID"
+                }
+              ]
+            },
+            "description": "Update a user by ID. Requires authentication."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Appeals",
+      "description": "Appeal management endpoints",
+      "item": [
+        {
+          "name": "Get All Appeals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appeals/",
+              "host": ["{{base_url}}"],
+              "path": ["appeals"]
+            },
+            "description": "List all appeals. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cancelled Appeals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appeals/?status=cancelled",
+              "host": ["{{base_url}}"],
+              "path": ["appeals"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "cancelled"
+                }
+              ]
+            },
+            "description": "List all cancelled appeals. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Appeal by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appeals/:id/",
+              "host": ["{{base_url}}"],
+              "path": ["appeals", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Appeal ID"
+                }
+              ]
+            },
+            "description": "Get a specific appeal by ID. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Appeal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Appeal\",\n  \"description\": \"This is a test appeal\",\n  \"amount\": 1000.00,\n  \"urgency\": \"high\",\n  \"category\": \"medical\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appeals/",
+              "host": ["{{base_url}}"],
+              "path": ["appeals"]
+            },
+            "description": "Create a new appeal. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Appeal",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Appeal\",\n  \"description\": \"Updated description\",\n  \"amount\": 1500.00,\n  \"urgency\": \"medium\",\n  \"category\": \"education\",\n  \"status\": \"approved\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appeals/:id/",
+              "host": ["{{base_url}}"],
+              "path": ["appeals", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Appeal ID"
+                }
+              ]
+            },
+            "description": "Update an appeal by ID. Requires authentication."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Donations",
+      "description": "Donation management endpoints",
+      "item": [
+        {
+          "name": "Get All Donations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/donations/",
+              "host": ["{{base_url}}"],
+              "path": ["donations"]
+            },
+            "description": "List all donations. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Donation by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/donations/:id/",
+              "host": ["{{base_url}}"],
+              "path": ["donations", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Donation ID"
+                }
+              ]
+            },
+            "description": "Get a specific donation by ID. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Donation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500.00,\n  \"donor_name\": \"Anonymous Donor\",\n  \"message\": \"For a good cause\",\n  \"payment_method\": \"card\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/donations/",
+              "host": ["{{base_url}}"],
+              "path": ["donations"]
+            },
+            "description": "Create a new donation. Requires authentication."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Wallet",
+      "description": "Wallet and withdrawal management endpoints",
+      "item": [
+        {
+          "name": "Get Wallet Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/wallet/stats/",
+              "host": ["{{base_url}}"],
+              "path": ["wallet", "stats"]
+            },
+            "description": "Get wallet statistics including total balance, available balance, and withdrawal counts. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Withdrawals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/wallet/requests/",
+              "host": ["{{base_url}}"],
+              "path": ["wallet", "requests"]
+            },
+            "description": "List all withdrawal requests. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Withdrawal by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/wallet/requests/:id/",
+              "host": ["{{base_url}}"],
+              "path": ["wallet", "requests", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Withdrawal Request ID"
+                }
+              ]
+            },
+            "description": "Get a specific withdrawal request by ID. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Withdrawal",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/wallet/requests/:id/",
+              "host": ["{{base_url}}"],
+              "path": ["wallet", "requests", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Withdrawal Request ID"
+                }
+              ]
+            },
+            "description": "Approve a withdrawal request. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Withdrawal",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"rejected\",\n  \"rejection_reason\": \"Insufficient documentation\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/wallet/requests/:id/",
+              "host": ["{{base_url}}"],
+              "path": ["wallet", "requests", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Withdrawal Request ID"
+                }
+              ]
+            },
+            "description": "Reject a withdrawal request with a reason. Requires authentication."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "description": "Dashboard statistics and activity endpoints",
+      "item": [
+        {
+          "name": "Recent Activity Feed",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/recent-activity/",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "recent-activity"]
+            },
+            "description": "Get recent activity feed for the dashboard. Requires authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/stats/?period=30",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "stats"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "30",
+                  "description": "Period in days (default: 30)"
+                }
+              ]
+            },
+            "description": "Get dashboard statistics for the specified period. Requires authentication."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "Authorization",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "Token {{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    }
+  ]
+} 
