@@ -165,3 +165,4 @@ temp/
 # Local development
 .local/
 local/ 
+.vercel

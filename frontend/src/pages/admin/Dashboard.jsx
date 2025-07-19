@@ -54,14 +54,14 @@ const StatCard = ({ title, value, icon: Icon, bgColor, textColor, isLoading, err
   }
 
   if (error) {
-    return (
+      return (
       <div className={`p-6 rounded-lg ${bgColor} ${isDark ? 'bg-gray-800 border-gray-600' : 'bg-gray-50 border-red-200'} border`}>
         <div className="flex items-center justify-between">
           <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{title}</h3>
           <ExclamationTriangleIcon className="h-6 w-6 text-red-500" />
         </div>
         <p className="mt-2 text-xs text-red-600">Error loading data</p>
-      </div>
+          </div>
     );
   }
 
@@ -70,7 +70,7 @@ const StatCard = ({ title, value, icon: Icon, bgColor, textColor, isLoading, err
       <div className="flex items-center justify-between">
         <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{title}</h3>
         <Icon className={`h-6 w-6 ${textColor}`} />
-      </div>
+  </div>
       <p className={`mt-2 text-2xl font-semibold ${textColor}`}>
         {typeof value === 'number' && title.toLowerCase().includes('donation') || title.toLowerCase().includes('wallet') || title.toLowerCase().includes('disbursed')
           ? formatRs(value)
@@ -88,20 +88,20 @@ const DonationsOverTimeChart = ({ data, isLoading, error }) => {
     return (
       <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow`}>
         <div className={`h-64 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded animate-pulse`}></div>
-      </div>
+  </div>
     );
   }
 
   if (error) {
-    return (
+  return (
       <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow`}>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <ExclamationTriangleIcon className="h-12 w-12 text-red-500 mx-auto mb-2" />
             <p className="text-red-600">Error loading chart data</p>
-          </div>
+            </div>
         </div>
-      </div>
+        </div>
     );
   }
 
@@ -431,7 +431,7 @@ const Dashboard = () => {
       <div className="mb-6">
         <h1 className={`text-2xl font-bold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Dashboard</h1>
         <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Overview of Mawaddah platform statistics</p>
-      </div>
+          </div>
 
       {/* Stat Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -470,9 +470,9 @@ const Dashboard = () => {
           data={charts.walletActivity}
           isLoading={loading}
           error={error}
-        />
-      </div>
-    </div>
+            />
+          </div>
+        </div>
   );
 };
 
