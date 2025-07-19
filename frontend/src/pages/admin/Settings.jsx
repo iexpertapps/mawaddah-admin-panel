@@ -26,7 +26,7 @@ const SettingsPage = () => {
   const canEdit = userRole === 'admin';
 
   return (
-    <AdminLayout pageTitle="Settings">
+    <>
       <div className="max-w-4xl mx-auto py-8">
         <div className="flex border-b border-gray-200 dark:border-gray-700 mb-8 overflow-x-auto">
           {TABS.map(tab => (
@@ -51,7 +51,7 @@ const SettingsPage = () => {
           {activeTab === 'audit' && <AuditLogSettings canEdit={canEdit} />}
         </div>
       </div>
-    </AdminLayout>
+    </>
   );
 };
 
