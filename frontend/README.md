@@ -136,3 +136,4 @@ The application is ready for deployment to any static hosting service:
 - Hot Module Replacement (HMR) is enabled for fast development
 - Tailwind CSS is configured with custom colors matching the brand
 - ESLint and Prettier are configured for code quality
+# Trigger redeploy
