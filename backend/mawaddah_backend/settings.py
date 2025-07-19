@@ -34,6 +34,8 @@ if isinstance(ALLOWED_HOSTS_RAW, bool):
 ALLOWED_HOSTS = [h.strip() for h in str(ALLOWED_HOSTS_RAW).split(',') if h.strip()]
 if 'healthcheck.railway.app' not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append('healthcheck.railway.app')
+if 'mawaddahapp.up.railway.app' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('mawaddahapp.up.railway.app')
 
 # Add Railway domain to allowed hosts
 if not DEBUG:
