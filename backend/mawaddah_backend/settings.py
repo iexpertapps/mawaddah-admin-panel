@@ -28,7 +28,12 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-jc2mx(-@)5=av^t5ai5f3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = str(config('ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver')).split(',')
+ALLOWED_HOSTS_RAW = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,healthcheck.railway.app')
+if isinstance(ALLOWED_HOSTS_RAW, bool):
+    ALLOWED_HOSTS_RAW = 'localhost,127.0.0.1,healthcheck.railway.app'
+ALLOWED_HOSTS = [h.strip() for h in str(ALLOWED_HOSTS_RAW).split(',') if h.strip()]
+if 'healthcheck.railway.app' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('healthcheck.railway.app')
 
 # Add Railway domain to allowed hosts
 if not DEBUG:
