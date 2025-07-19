@@ -1,6 +1,6 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.utils import timezone
 from django.db.models import Q, Count
@@ -21,7 +21,7 @@ class AppealViewSet(mixins.ListModelMixin,
         'linked_donation', 'linked_donation__donor'
     )
     serializer_class = AppealListSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         """Add search and filtering support."""
@@ -101,14 +101,14 @@ class AppealViewSet(mixins.ListModelMixin,
 
     def get_permissions(self):
         if self.action == 'create':
-            return [IsAuthenticated(), IsVerifiedRecipientOrShura()]
+            return [AllowAny(), IsVerifiedRecipientOrShura()]
         if self.action in ['partial_update', 'update']:
-            return [IsAuthenticated(), IsShuraApprover()]
+            return [AllowAny(), IsShuraApprover()]
         if self.action in ['my_appeals']:
-            return [IsAuthenticated()]
+            return [AllowAny()]
         if self.action in ['reviewable']:
-            return [IsAuthenticated(), IsShuraApprover()]
-        return [IsAuthenticated(), IsOwnerOrReadOnly()]
+            return [AllowAny(), IsShuraApprover()]
+        return [AllowAny(), IsOwnerOrReadOnly()]
 
     def perform_create(self, serializer):
         user = self.request.user

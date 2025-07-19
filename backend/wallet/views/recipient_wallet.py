@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from wallet.models import Wallet, WalletTransaction
@@ -16,7 +16,7 @@ import json
 from wallet.utils import generate_description, resolve_transfer_by
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def wallet_balance(request):
     """Get wallet balance for the authenticated user."""
     try:
@@ -48,7 +48,7 @@ def wallet_balance(request):
         )
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def wallet_transactions(request):
     """Get wallet transaction history for the authenticated user."""
     try:
@@ -83,7 +83,7 @@ def wallet_transactions(request):
         )
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def withdraw_funds(request):
     """Withdraw funds from wallet."""
     try:

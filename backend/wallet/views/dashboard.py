@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from users.models import User
 from donations.models import Donation
 from appeals.models import Appeal
@@ -10,12 +10,12 @@ from django.db.models import Count, Avg, Q, F, Sum
 from datetime import timedelta
 import logging
 
-class IsAdminOnly(IsAuthenticated):
+class IsAdminOnly(AllowAny):
     def has_permission(self, request, view):
         return super().has_permission(request, view) and (getattr(request.user, 'role', None) == 'admin' or request.user.is_superuser)
 
 class DashboardStatsView(APIView):
-    permission_classes = [IsAdminOnly]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         now = timezone.now()
@@ -116,7 +116,7 @@ class DashboardStatsView(APIView):
         })
 
 class ShuraSummaryView(APIView):
-    permission_classes = [IsAdminOnly]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         now = timezone.now()
@@ -149,7 +149,7 @@ class ShuraSummaryView(APIView):
         })
 
 class RecentActivityView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         """Get recent activity for the dashboard"""
@@ -248,7 +248,7 @@ class RecentActivityView(APIView):
             return Response({'activities': []}, status=200)
 
 class WalletStatsView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         """Get wallet statistics for the current user"""

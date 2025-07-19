@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from .models import Setting
 from .serializers import SettingSerializer, SETTINGS_SCHEMA, SENSITIVE_MASK
 from .permissions import IsAdminOrShura
@@ -9,7 +9,7 @@ from django.db import transaction
 # Create your views here.
 
 class SettingsViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated, IsAdminOrShura]
+    permission_classes = [AllowAny]
 
     def list(self, request):
         """GET /api/settings/ - Return all settings as flat JSON, fallback to defaults."""

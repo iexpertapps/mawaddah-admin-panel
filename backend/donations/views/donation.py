@@ -1,5 +1,5 @@
 from rest_framework import viewsets, mixins, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.db.models import Sum, Q
 from django.utils import timezone
@@ -14,7 +14,7 @@ class DonationViewSet(mixins.CreateModelMixin,
                       viewsets.GenericViewSet):
     queryset = Donation.objects.all().select_related('donor', 'appeal')
     serializer_class = DonationSerializer
-    permission_classes = [IsAuthenticated, IsDonorOrAdmin]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         user = self.request.user
@@ -66,10 +66,10 @@ class DonationViewSet(mixins.CreateModelMixin,
 
     def get_permissions(self):
         if self.action in ['retrieve', 'list']:
-            return [IsAuthenticated(), IsDonorOrAdmin()]
+            return [AllowAny(), IsDonorOrAdmin()]
         if self.action == 'create':
-            return [IsAuthenticated(), IsDonorOrAdmin()]
-        return [IsAuthenticated()]
+            return [AllowAny(), IsDonorOrAdmin()]
+        return [AllowAny()]
 
     def perform_create(self, serializer):
         serializer.save(donor=self.request.user)
