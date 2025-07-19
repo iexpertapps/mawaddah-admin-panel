@@ -6,6 +6,8 @@ import { Heading, Text, Label } from '../../components/atoms/typography'
 import { useTheme } from '../../context/ThemeContext'
 import { Eye, EyeOff } from 'lucide-react';
 
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'https://mawaddahapp.up.railway.app';
+
 const Login = () => {
   const { theme, isDark } = useTheme()
   const navigate = useNavigate()
@@ -51,7 +53,7 @@ const Login = () => {
     setFormError('')
     
     try {
-      const response = await fetch('http://localhost:8000/api/auth/login/', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from './useAuth'
 
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'https://mawaddahapp.up.railway.app';
+
 export const useDashboardStats = () => {
   const { token } = useAuth()
   const [stats, setStats] = useState(null)
@@ -17,7 +19,7 @@ export const useDashboardStats = () => {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('http://localhost:8000/api/dashboard/stats/', {
+      const response = await fetch(`${API_BASE_URL}/api/dashboard/stats/`, {
         headers: {
           'Authorization': `Token ${token}`,
           'Content-Type': 'application/json',
