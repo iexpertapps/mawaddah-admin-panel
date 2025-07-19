@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 from decouple import config
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,6 +29,10 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-jc2mx(-@)5=av^t5ai5f3
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = str(config('ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver')).split(',')
+
+# Add Railway domain to allowed hosts
+if not DEBUG:
+    ALLOWED_HOSTS.extend(['*.railway.app', '*.up.railway.app'])
 
 
 # Application definition
@@ -58,6 +63,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add whitenoise for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -99,16 +105,21 @@ DATABASES = {
 
 # Use PostgreSQL in production
 if not DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME'),
-            'USER': config('DB_USER'),
-            'PASSWORD': config('DB_PASSWORD'),
-            'HOST': config('DB_HOST', default='localhost'),
-            'PORT': config('DB_PORT', default='5432'),
+    # Use Railway's DATABASE_URL if available
+    DATABASE_URL = config('DATABASE_URL', default=None)
+    if DATABASE_URL:
+        DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
+    else:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': config('DB_NAME'),
+                'USER': config('DB_USER'),
+                'PASSWORD': config('DB_PASSWORD'),
+                'HOST': config('DB_HOST', default='localhost'),
+                'PORT': config('DB_PORT', default='5432'),
+            }
         }
-    }
 
 
 # Password validation
@@ -147,6 +158,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Whitenoise settings for static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
@@ -187,7 +201,16 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5174",
+    "https://mawaddahapp.vercel.app",  # Add your Vercel frontend
+    "https://frontend-9scb7js39-mawaddah-admin-dashboards-projects.vercel.app",  # Add your Vercel frontend
 ]
+
+# Add Railway domains to CORS
+if not DEBUG:
+    CORS_ALLOWED_ORIGINS.extend([
+        "https://*.railway.app",
+        "https://*.up.railway.app",
+    ])
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -214,7 +237,16 @@ CORS_ALLOW_HEADERS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
+    "https://mawaddahapp.vercel.app",
+    "https://frontend-9scb7js39-mawaddah-admin-dashboards-projects.vercel.app",
 ]
+
+# Add Railway domains to CSRF trusted origins
+if not DEBUG:
+    CSRF_TRUSTED_ORIGINS.extend([
+        "https://*.railway.app",
+        "https://*.up.railway.app",
+    ])
 
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
@@ -223,3 +255,13 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 APPEND_SLASH = True
+
+# Security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = 'DENY'
