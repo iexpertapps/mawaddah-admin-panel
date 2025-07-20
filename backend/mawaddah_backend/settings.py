@@ -53,14 +53,7 @@ else:
 if any(key.startswith('RAILWAY_') for key in os.environ.keys()):
     DEBUG = False
 
-ALLOWED_HOSTS_RAW = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,healthcheck.railway.app,mawaddahapp.up.railway.app')
-if isinstance(ALLOWED_HOSTS_RAW, bool):
-    ALLOWED_HOSTS_RAW = 'localhost,127.0.0.1,healthcheck.railway.app,mawaddahapp.up.railway.app'
-ALLOWED_HOSTS = [h.strip() for h in str(ALLOWED_HOSTS_RAW).split(',') if h.strip()]
-if 'healthcheck.railway.app' not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append('healthcheck.railway.app')
-if 'mawaddahapp.up.railway.app' not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append('mawaddahapp.up.railway.app')
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost").split(",")
 
 # Add Railway domain to allowed hosts
 if not DEBUG:
