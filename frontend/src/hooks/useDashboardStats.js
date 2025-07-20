@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from './useAuth'
-
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'https://mawaddahapp.up.railway.app';
+import api from '../services/api'
 
 export const useDashboardStats = () => {
   const { token } = useAuth()
@@ -19,15 +18,8 @@ export const useDashboardStats = () => {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(`${API_BASE_URL}/api/dashboard/stats/`, {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
-        },
-      })
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
-      const data = await response.json()
-      setStats(data?.stats || {})
+      const response = await api.get('/api/dashboard/stats/')
+      setStats(response.data?.stats || {})
       setLastUpdated(new Date())
     } catch (err) {
       setError(err.message || 'Failed to load dashboard data')

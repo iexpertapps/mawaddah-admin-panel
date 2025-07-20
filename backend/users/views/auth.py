@@ -74,29 +74,4 @@ def me_view(request):
     Get current user profile
     """
     serializer = UserSerializer(request.user)
-    return Response(serializer.data)
-
-
-# TEMPORARY: Mock authentication for testing
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def mock_auth_view(request):
-    """
-    Temporary mock authentication endpoint for testing
-    """
-    # Check if mock token is provided
-    auth_header = request.headers.get('Authorization', '')
-    if 'mock-token-for-testing' in auth_header:
-        # Return mock admin user data
-        return Response({
-            'id': 1,
-            'email': 'admin@mawaddah.com',
-            'name': 'Admin User',
-            'role': 'admin',
-            'is_verified_syed': False,
-            'wallet_balance': '0.00'
-        })
-    
-    return Response({
-        'error': 'Invalid token'
-    }, status=status.HTTP_401_UNAUTHORIZED) 
+    return Response(serializer.data) 

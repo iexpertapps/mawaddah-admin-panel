@@ -26,6 +26,14 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import { useDashboardStats } from '../../hooks/useDashboardStats';
+import { useStatTotalDonors } from '../../hooks/useStatTotalDonors';
+import { useStatTotalUsers } from '../../hooks/useStatTotalUsers';
+import { useStatTotalShuraMembers } from '../../hooks/useStatTotalShuraMembers';
+import { useStatTotalDonationAmount } from '../../hooks/useStatTotalDonationAmount';
+import { useStatAppealsByShura } from '../../hooks/useStatAppealsByShura';
+import { useStatCancelledAppeals } from '../../hooks/useStatCancelledAppeals';
+import { useWalletStats } from '../../hooks/useWalletStats';
 
 // Utility function for Rs formatting
 const formatRs = (amount) => {
@@ -285,87 +293,68 @@ const WalletActivityChart = ({ data, isLoading, error }) => {
 // Main Dashboard Component
 const Dashboard = () => {
   const { isDark } = useTheme();
-  const [stats, setStats] = useState({
-    totalAppeals: 0,
-    approvedAppeals: 0,
-    disbursedDonations: 0,
-    pendingApprovals: 0,
-    activeDonors: 0,
-    totalWalletBalance: 0,
-    shuraMembers: 0,
-    blockedUsers: 0
-  });
-  const [charts, setCharts] = useState({
-    donationsOverTime: [],
-    appealStatus: [],
-    userRoles: [],
-    walletActivity: []
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  
+  // Real API hooks
+  const { stats: dashboardStats, loading: dashboardLoading, error: dashboardError } = useDashboardStats();
+  const { data: totalDonors, loading: donorsLoading, error: donorsError } = useStatTotalDonors();
+  const { data: totalUsers, loading: usersLoading, error: usersError } = useStatTotalUsers();
+  const { data: totalShuraMembers, loading: shuraLoading, error: shuraError } = useStatTotalShuraMembers();
+  const { data: totalDonationAmount, loading: donationLoading, error: donationError } = useStatTotalDonationAmount();
+  const { data: appealsByShura, loading: appealsLoading, error: appealsError } = useStatAppealsByShura();
+  const { data: cancelledAppeals, loading: cancelledLoading, error: cancelledError } = useStatCancelledAppeals();
+  const { data: walletStats, loading: walletLoading, error: walletError } = useWalletStats();
 
-  // Mock data for demonstration
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        
-        // Simulate API calls
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock stats data
-        setStats({
-          totalAppeals: 45,
-          approvedAppeals: 30,
-          disbursedDonations: 254000,
-          pendingApprovals: 12,
-          activeDonors: 61,
-          totalWalletBalance: 381000,
-          shuraMembers: 5,
-          blockedUsers: 1
-        });
+  // Combine loading states
+  const loading = dashboardLoading || donorsLoading || usersLoading || shuraLoading || 
+                  donationLoading || appealsLoading || cancelledLoading || walletLoading;
+  
+  // Combine error states
+  const error = dashboardError || donorsError || usersError || shuraError || 
+                donationError || appealsError || cancelledError || walletError;
 
-        // Mock charts data
-        setCharts({
-          donationsOverTime: [
-            { month: 'Jan', donations: 15000 },
-            { month: 'Feb', donations: 18000 },
-            { month: 'Mar', donations: 22000 },
-            { month: 'Apr', donations: 17000 },
-            { month: 'May', donations: 23000 },
-            { month: 'Jun', donations: 28000 }
-          ],
-          appealStatus: [
-            { name: 'Approved', value: 30 },
-            { name: 'Pending', value: 12 },
-            { name: 'Rejected', value: 3 }
-          ],
-          userRoles: [
-            { role: 'Donors', count: 45 },
-            { role: 'Recipients', count: 32 },
-            { role: 'Shura', count: 5 },
-            { role: 'Admin', count: 3 }
-          ],
-          walletActivity: [
-            { day: 'Mon', credit: 5000, debit: 2000 },
-            { day: 'Tue', credit: 3000, debit: 1500 },
-            { day: 'Wed', credit: 7000, debit: 3000 },
-            { day: 'Thu', credit: 4000, debit: 2500 },
-            { day: 'Fri', credit: 6000, debit: 1800 },
-            { day: 'Sat', credit: 2000, debit: 1000 },
-            { day: 'Sun', credit: 3500, debit: 2200 }
-          ]
-        });
+  // Calculate stats from real data
+  const stats = {
+    totalAppeals: dashboardStats?.total_appeals || appealsByShura?.total || 0,
+    approvedAppeals: dashboardStats?.approved_appeals || appealsByShura?.approved || 0,
+    disbursedDonations: totalDonationAmount || 0,
+    pendingApprovals: dashboardStats?.pending_approvals || appealsByShura?.pending || 0,
+    activeDonors: totalDonors || 0,
+    totalWalletBalance: walletStats?.total_balance || 0,
+    shuraMembers: totalShuraMembers || 0,
+    blockedUsers: dashboardStats?.blocked_users || 0
+  };
 
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  // Generate charts data from real API data
+  const charts = {
+    donationsOverTime: dashboardStats?.donations_over_time || [
+      { month: 'Jan', donations: 0 },
+      { month: 'Feb', donations: 0 },
+      { month: 'Mar', donations: 0 },
+      { month: 'Apr', donations: 0 },
+      { month: 'May', donations: 0 },
+      { month: 'Jun', donations: 0 }
+    ],
+    appealStatus: [
+      { name: 'Approved', value: stats.approvedAppeals },
+      { name: 'Pending', value: stats.pendingApprovals },
+      { name: 'Rejected', value: cancelledAppeals || 0 }
+    ],
+    userRoles: [
+      { role: 'Donors', count: stats.activeDonors },
+      { role: 'Recipients', count: totalUsers - stats.activeDonors - stats.shuraMembers },
+      { role: 'Shura', count: stats.shuraMembers },
+      { role: 'Admin', count: 1 }
+    ],
+    walletActivity: walletStats?.activity || [
+      { day: 'Mon', credit: 0, debit: 0 },
+      { day: 'Tue', credit: 0, debit: 0 },
+      { day: 'Wed', credit: 0, debit: 0 },
+      { day: 'Thu', credit: 0, debit: 0 },
+      { day: 'Fri', credit: 0, debit: 0 },
+      { day: 'Sat', credit: 0, debit: 0 },
+      { day: 'Sun', credit: 0, debit: 0 }
+    ]
+  };
 
   const statCards = [
     {

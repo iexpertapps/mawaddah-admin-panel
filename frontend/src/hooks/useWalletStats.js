@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from './useAuth'
+import api from '../services/api'
 
 export function useWalletStats() {
   const { token } = useAuth()
@@ -15,35 +16,18 @@ export function useWalletStats() {
     }
     setLoading(true)
     setError(null)
-    fetch('/api/wallet/stats/', {
-      headers: { 'Authorization': `Token ${token}` }
-    })
+    api.get('/api/wallet/stats/')
       .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch wallet stats')
-        return res.json()
-      })
-      .then(json => {
-        setData({
-          totalWithdrawals: json.total_withdrawals || 0,
-          approvedWithdrawals: json.approved_withdrawals || 0,
-          pendingWithdrawals: json.pending_withdrawals || 0,
-          transactions: json.transactions || [],
-          count: json.count || 0
-        })
+        setData(res.data)
       })
       .catch(() => setError('Data unavailable'))
       .finally(() => setLoading(false))
   }, [token])
 
-  return { 
-    data: data ?? {
-      totalWithdrawals: 0,
-      approvedWithdrawals: 0,
-      pendingWithdrawals: 0,
-      transactions: [],
-      count: 0
-    }, 
-    loading, 
-    error 
+  return {
+    data: data ?? { total_balance: 0, activity: [] },
+    loading,
+    error,
+    value: data ?? { total_balance: 0, activity: [] }
   }
 } 

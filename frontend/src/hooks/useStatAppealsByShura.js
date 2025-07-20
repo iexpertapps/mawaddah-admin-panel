@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from './useAuth'
+import api from '../services/api'
 
 export function useStatAppealsByShura() {
   const { token } = useAuth()
@@ -15,26 +16,30 @@ export function useStatAppealsByShura() {
     }
     setLoading(true)
     setError(null)
-    fetch('/api/appeals/', {
-      headers: { 'Authorization': `Token ${token}` }
-    })
+    api.get('/api/appeals/')
       .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch appeals')
-        return res.json()
-      })
-      .then(json => {
-        const appeals = Array.isArray(json) ? json : (json.results || [])
-        const shuraAppeals = appeals.filter(appeal => appeal.approved_by_shura || appeal.shura_approved)
-        setData(shuraAppeals.length)
+        const appeals = Array.isArray(res.data) ? res.data : (res.data.results || [])
+        // Count appeals by status
+        const total = appeals.length
+        const approved = appeals.filter(appeal => appeal.status === 'approved').length
+        const pending = appeals.filter(appeal => appeal.status === 'pending').length
+        const rejected = appeals.filter(appeal => appeal.status === 'rejected').length
+        
+        setData({
+          total,
+          approved,
+          pending,
+          rejected
+        })
       })
       .catch(() => setError('Data unavailable'))
       .finally(() => setLoading(false))
   }, [token])
 
   return {
-    data: data ?? 0,
+    data: data ?? { total: 0, approved: 0, pending: 0, rejected: 0 },
     loading,
     error,
-    value: data ?? 0
+    value: data ?? { total: 0, approved: 0, pending: 0, rejected: 0 }
   }
 } 

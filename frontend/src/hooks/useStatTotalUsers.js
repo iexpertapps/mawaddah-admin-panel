@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from './useAuth'
+import api from '../services/api'
 
 export function useStatTotalUsers() {
   const { token } = useAuth()
@@ -15,15 +16,9 @@ export function useStatTotalUsers() {
     }
     setLoading(true)
     setError(null)
-    fetch('/api/users/', {
-      headers: { 'Authorization': `Token ${token}` }
-    })
+    api.get('/api/users/')
       .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch users')
-        return res.json()
-      })
-      .then(json => {
-        const count = Array.isArray(json) ? json.length : (json.count || 0)
+        const count = Array.isArray(res.data) ? res.data.length : (res.data.count || 0)
         setData(count)
       })
       .catch(() => setError('Data unavailable'))

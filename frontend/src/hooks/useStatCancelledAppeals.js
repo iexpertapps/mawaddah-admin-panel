@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from './useAuth'
+import api from '../services/api'
 
 export function useStatCancelledAppeals() {
   const { token } = useAuth()
@@ -15,17 +16,12 @@ export function useStatCancelledAppeals() {
     }
     setLoading(true)
     setError(null)
-    fetch('/api/appeals/', {
-      headers: { 'Authorization': `Token ${token}` }
-    })
+    api.get('/api/appeals/')
       .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch appeals')
-        return res.json()
-      })
-      .then(json => {
-        const appeals = Array.isArray(json) ? json : (json.results || [])
-        const cancelledAppeals = appeals.filter(appeal => appeal.status === 'cancelled' || appeal.is_cancelled)
-        setData(cancelledAppeals.length)
+        const appeals = Array.isArray(res.data) ? res.data : (res.data.results || [])
+        // Count cancelled appeals
+        const cancelledCount = appeals.filter(appeal => appeal.status === 'cancelled').length
+        setData(cancelledCount)
       })
       .catch(() => setError('Data unavailable'))
       .finally(() => setLoading(false))

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from './useAuth'
+import api from '../services/api'
 
 export function useStatTotalShuraMembers() {
   const { token } = useAuth()
@@ -15,18 +16,12 @@ export function useStatTotalShuraMembers() {
     }
     setLoading(true)
     setError(null)
-    fetch('/api/users/?role=shura', {
-      headers: { 'Authorization': `Token ${token}` }
-    })
+    api.get('/api/users/')
       .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch shura members')
-        return res.json()
-      })
-      .then(json => {
-        const users = Array.isArray(json) ? json : (json.results || [])
-        // Count users with role='shura'
-        const shuraMembers = users.filter(user => user.role === 'shura')
-        setData(shuraMembers.length)
+        const users = Array.isArray(res.data) ? res.data : (res.data.results || [])
+        // Count users with role 'shura'
+        const shuraCount = users.filter(user => user.role === 'shura').length
+        setData(shuraCount)
       })
       .catch(() => setError('Data unavailable'))
       .finally(() => setLoading(false))

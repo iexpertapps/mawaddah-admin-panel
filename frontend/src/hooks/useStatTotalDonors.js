@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from './useAuth'
+import api from '../services/api'
 
 export function useStatTotalDonors() {
   const { token } = useAuth()
@@ -15,15 +16,9 @@ export function useStatTotalDonors() {
     }
     setLoading(true)
     setError(null)
-    fetch('/api/donations/', {
-      headers: { 'Authorization': `Token ${token}` }
-    })
+    api.get('/api/donations/')
       .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch donations')
-        return res.json()
-      })
-      .then(json => {
-        const donations = Array.isArray(json) ? json : (json.results || [])
+        const donations = Array.isArray(res.data) ? res.data : (res.data.results || [])
         // Count unique donors (users who have made at least one donation)
         const uniqueDonorIds = new Set(
           donations

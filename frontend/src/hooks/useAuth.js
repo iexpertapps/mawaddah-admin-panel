@@ -2,12 +2,9 @@ import { useNavigate } from 'react-router-dom';
 
 export const useAuth = () => {
   const navigate = useNavigate();
-  
-  // TEMPORARY: For testing purposes, provide a mock token
-  // In production, this should come from localStorage/sessionStorage
   const token = typeof window !== 'undefined'
-    ? localStorage.getItem('authToken') || sessionStorage.getItem('authToken') || 'mock-token-for-testing'
-    : 'mock-token-for-testing';
+    ? localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
+    : null;
   
   // Create a user object based on token presence
   const user = token ? {

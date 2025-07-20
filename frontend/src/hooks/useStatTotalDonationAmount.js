@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from './useAuth'
+import api from '../services/api'
 
 export function useStatTotalDonationAmount() {
   const { token } = useAuth()
@@ -15,17 +16,12 @@ export function useStatTotalDonationAmount() {
     }
     setLoading(true)
     setError(null)
-    fetch('/api/donations/', {
-      headers: { 'Authorization': `Token ${token}` }
-    })
+    api.get('/api/donations/')
       .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch donations')
-        return res.json()
-      })
-      .then(json => {
-        const donations = Array.isArray(json) ? json : (json.results || [])
-        const total = donations.reduce((sum, donation) => sum + (parseFloat(donation.amount) || 0), 0)
-        setData(total)
+        const donations = Array.isArray(res.data) ? res.data : (res.data.results || [])
+        // Sum all donation amounts
+        const totalAmount = donations.reduce((sum, donation) => sum + (parseFloat(donation.amount) || 0), 0)
+        setData(totalAmount)
       })
       .catch(() => setError('Data unavailable'))
       .finally(() => setLoading(false))
