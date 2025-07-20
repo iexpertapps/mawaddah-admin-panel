@@ -33,12 +33,17 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-jc2mx(-@)5=av^t5ai5f3
 import os
 RAILWAY_ENVIRONMENT = os.environ.get('RAILWAY_ENVIRONMENT', None)
 
-if RAILWAY_ENVIRONMENT:
+# Force DEBUG to False on Railway
+if RAILWAY_ENVIRONMENT or os.environ.get('RAILWAY_PROJECT_ID') or os.environ.get('RAILWAY_SERVICE_ID'):
     # We're on Railway - force DEBUG to False
     DEBUG = False
 else:
     # Local development - use environment variable
     DEBUG = config('DEBUG', default=False, cast=bool)
+
+# Additional safety check - if we detect Railway, force DEBUG to False
+if any(key.startswith('RAILWAY_') for key in os.environ.keys()):
+    DEBUG = False
 
 ALLOWED_HOSTS_RAW = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,healthcheck.railway.app,mawaddahapp.up.railway.app')
 if isinstance(ALLOWED_HOSTS_RAW, bool):
