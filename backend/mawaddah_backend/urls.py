@@ -53,7 +53,7 @@ def root_view(request):
     return JsonResponse({"status": "Mawaddah API is Live", "version": "1.0"})
 
 urlpatterns = [
-    path('', root_view),
+    path('', health_check, name='root-health-check'),  # Root path for Railway healthcheck
     path('admin/', admin.site.urls),
     path('api/admin/profile/', AdminProfileView.as_view(), name='admin-profile'),
     path('api/', include(router.urls)),
