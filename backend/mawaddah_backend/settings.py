@@ -27,7 +27,18 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-jc2mx(-@)5=av^t5ai5f3
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Updated for Railway deployment - force redeploy
-DEBUG = config('DEBUG', default=False, cast=bool)
+# Force DEBUG to False in production regardless of environment variables
+
+# Check if we're in production (Railway sets RAILWAY_ENVIRONMENT)
+import os
+RAILWAY_ENVIRONMENT = os.environ.get('RAILWAY_ENVIRONMENT', None)
+
+if RAILWAY_ENVIRONMENT:
+    # We're on Railway - force DEBUG to False
+    DEBUG = False
+else:
+    # Local development - use environment variable
+    DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS_RAW = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,healthcheck.railway.app,mawaddahapp.up.railway.app')
 if isinstance(ALLOWED_HOSTS_RAW, bool):
