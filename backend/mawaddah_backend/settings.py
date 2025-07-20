@@ -205,21 +205,22 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
+# --- SECURITY SETTINGS FOR PRODUCTION ---
+SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', 3600))
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'True') == 'True'
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+# --- END SECURITY SETTINGS ---
+
 # CORS settings
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5175",
-    "http://127.0.0.1:5175",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:5174",
-    "http://127.0.0.1:5174",
-    "https://mawaddahapp.vercel.app",
-    "https://frontend-9scb7js39-mawaddah-admin-dashboards-projects.vercel.app",
-    "https://frontend-d97qevp05-mawaddah-admin-dashboards-projects.vercel.app",
-    "https://frontend-ec07x4pjl-mawaddah-admin-dashboards-projects.vercel.app",
-]
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'https://mawaddahapp.vercel.app').split(',')
 
 # Add Railway domains to CORS
 if not DEBUG:
@@ -251,13 +252,7 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "https://mawaddahapp.vercel.app",
-    "https://frontend-9scb7js39-mawaddah-admin-dashboards-projects.vercel.app",
-    "https://frontend-d97qevp05-mawaddah-admin-dashboards-projects.vercel.app",
-    "https://frontend-ec07x4pjl-mawaddah-admin-dashboards-projects.vercel.app",
-]
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'https://mawaddahapp.up.railway.app').split(',')
 
 # Add Railway domains to CSRF trusted origins
 if not DEBUG:
