@@ -45,6 +45,10 @@ def debug_env(request):
     }
     return JsonResponse(env_vars)
 
+def health_check(request):
+    """Simple health check endpoint for Railway"""
+    return JsonResponse({'status': 'healthy', 'message': 'Django app is running'})
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/admin/profile/', AdminProfileView.as_view(), name='admin-profile'),
@@ -60,6 +64,7 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/settings/', include('settings.urls')),
     path('api/debug/env/', debug_env, name='debug_env'),
+    path('health/', health_check, name='health_check'),
 ]
 
 # Serve static and media files in development
