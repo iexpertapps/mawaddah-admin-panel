@@ -53,7 +53,8 @@ else:
 if any(key.startswith('RAILWAY_') for key in os.environ.keys()):
     DEBUG = False
 
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost").split(",")
+# Set ALLOWED_HOSTS from environment for Railway production
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Add Railway domain to allowed hosts
 if not DEBUG:
@@ -247,7 +248,8 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'https://mawaddahapp.up.railway.app').split(',')
+# CSRF Trusted Origins from environment
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if os.getenv('CSRF_TRUSTED_ORIGINS') else []
 
 # Add Railway domains to CSRF trusted origins
 if not DEBUG:
