@@ -28,9 +28,9 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-jc2mx(-@)5=av^t5ai5f3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS_RAW = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,healthcheck.railway.app')
+ALLOWED_HOSTS_RAW = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,healthcheck.railway.app,mawaddahapp.up.railway.app')
 if isinstance(ALLOWED_HOSTS_RAW, bool):
-    ALLOWED_HOSTS_RAW = 'localhost,127.0.0.1,healthcheck.railway.app'
+    ALLOWED_HOSTS_RAW = 'localhost,127.0.0.1,healthcheck.railway.app,mawaddahapp.up.railway.app'
 ALLOWED_HOSTS = [h.strip() for h in str(ALLOWED_HOSTS_RAW).split(',') if h.strip()]
 if 'healthcheck.railway.app' not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append('healthcheck.railway.app')
@@ -190,10 +190,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5174",
-    "https://mawaddahapp.vercel.app",  # Add your Vercel frontend
-    "https://frontend-9scb7js39-mawaddah-admin-dashboards-projects.vercel.app",  # Add your Vercel frontend
-    "https://frontend-d97qevp05-mawaddah-admin-dashboards-projects.vercel.app",  # NEW: latest Vercel deployment
-    "https://frontend-ec07x4pjl-mawaddah-admin-dashboards-projects.vercel.app",  # Current Vercel deployment
+    "https://mawaddahapp.vercel.app",
+    "https://frontend-9scb7js39-mawaddah-admin-dashboards-projects.vercel.app",
+    "https://frontend-d97qevp05-mawaddah-admin-dashboards-projects.vercel.app",
+    "https://frontend-ec07x4pjl-mawaddah-admin-dashboards-projects.vercel.app",
 ]
 
 # Add Railway domains to CORS
@@ -230,8 +230,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "https://mawaddahapp.vercel.app",
     "https://frontend-9scb7js39-mawaddah-admin-dashboards-projects.vercel.app",
-    "https://frontend-d97qevp05-mawaddah-admin-dashboards-projects.vercel.app",  # NEW: latest Vercel deployment
-    "https://frontend-ec07x4pjl-mawaddah-admin-dashboards-projects.vercel.app",  # Current Vercel deployment
+    "https://frontend-d97qevp05-mawaddah-admin-dashboards-projects.vercel.app",
+    "https://frontend-ec07x4pjl-mawaddah-admin-dashboards-projects.vercel.app",
 ]
 
 # Add Railway domains to CSRF trusted origins
@@ -260,9 +260,13 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
     SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
     SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 else:
     # Development security settings
     SECURE_SSL_REDIRECT = False
     SECURE_HSTS_SECONDS = 0
     SECURE_HSTS_INCLUDE_SUBDOMAINS = False
     SECURE_HSTS_PRELOAD = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
