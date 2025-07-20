@@ -31,6 +31,11 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-jc2mx(-@)5=av^t5ai5f3
 
 # Check if we're in production (Railway sets RAILWAY_ENVIRONMENT)
 import os
+
+# Force override DEBUG environment variable on Railway
+if any(key.startswith('RAILWAY_') for key in os.environ.keys()):
+    os.environ['DEBUG'] = 'False'
+
 RAILWAY_ENVIRONMENT = os.environ.get('RAILWAY_ENVIRONMENT', None)
 
 # Force DEBUG to False on Railway
