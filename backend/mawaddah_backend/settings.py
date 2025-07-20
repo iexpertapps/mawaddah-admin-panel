@@ -193,6 +193,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://mawaddahapp.vercel.app",  # Add your Vercel frontend
     "https://frontend-9scb7js39-mawaddah-admin-dashboards-projects.vercel.app",  # Add your Vercel frontend
     "https://frontend-d97qevp05-mawaddah-admin-dashboards-projects.vercel.app",  # NEW: latest Vercel deployment
+    "https://frontend-ec07x4pjl-mawaddah-admin-dashboards-projects.vercel.app",  # Current Vercel deployment
 ]
 
 # Add Railway domains to CORS
@@ -230,6 +231,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://mawaddahapp.vercel.app",
     "https://frontend-9scb7js39-mawaddah-admin-dashboards-projects.vercel.app",
     "https://frontend-d97qevp05-mawaddah-admin-dashboards-projects.vercel.app",  # NEW: latest Vercel deployment
+    "https://frontend-ec07x4pjl-mawaddah-admin-dashboards-projects.vercel.app",  # Current Vercel deployment
 ]
 
 # Add Railway domains to CSRF trusted origins
