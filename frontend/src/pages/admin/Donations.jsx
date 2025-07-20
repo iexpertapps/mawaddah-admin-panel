@@ -626,79 +626,77 @@ const Donations = () => {
 
   return (
     <DonationsErrorBoundary>
-      <AdminLayout pageTitle="Donations">
-        <div className="space-y-6 animate-fade-in">
-          {/* Page Header */}
-          <div className="flex items-center justify-between">
-            <Heading level={1}>Donations</Heading>
-          </div>
+      <div className="space-y-6 animate-fade-in">
+        {/* Page Header */}
+        <div className="flex items-center justify-between">
+          <Heading level={1}>Donations</Heading>
+        </div>
 
-          {/* Stat Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <EnhancedStatCard
-              icon={CurrencyDollarIcon}
-              title="Total Donations"
-              value={stats.totalAmount}
-              loading={statsLoading}
-              error={statsError}
-              onClick={() => handleStatCardClick('all')}
-            />
-            <EnhancedStatCard
-              icon={BanknotesIcon}
-              title="Via Bank"
-              value={stats.viaBank}
-              loading={statsLoading}
-              error={statsError}
-              onClick={() => handleStatCardClick('bank')}
-            />
-            <EnhancedStatCard
-              icon={CreditCardIcon}
-              title="Via JazzCash"
-              value={stats.viaJazzCash}
-              loading={statsLoading}
-              error={statsError}
-              onClick={() => handleStatCardClick('jazzcash')}
-            />
-            <EnhancedStatCard
-              icon={CreditCardIcon}
-              title="Via Easypaisa"
-              value={stats.viaEasypaisa}
-              loading={statsLoading}
-              error={statsError}
-              onClick={() => handleStatCardClick('easypaisa')}
-            />
-          </div>
-
-          {/* Filter Bar */}
-          <DonationFilterBar
-            filters={filters}
-            onFiltersChange={handleFiltersChange}
-            activeFilter={activeFilter}
-            onClearFilter={handleClearFilter}
+        {/* Stat Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <EnhancedStatCard
+            icon={CurrencyDollarIcon}
+            title="Total Donations"
+            value={stats.totalAmount}
+            loading={statsLoading}
+            error={statsError}
+            onClick={() => handleStatCardClick('all')}
           />
-
-          {/* Donations Table with smooth loading */}
-          <DonationsTable
-            donations={donations}
-            loading={loading}
-            error={error}
-            onView={handleViewDonation}
-            totalCount={totalCount}
-            filteredCount={filteredCount}
-            currentPage={currentPage}
-            pageSize={pageSize}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
+          <EnhancedStatCard
+            icon={BanknotesIcon}
+            title="Via Bank"
+            value={stats.viaBank}
+            loading={statsLoading}
+            error={statsError}
+            onClick={() => handleStatCardClick('bank')}
           />
-
-          {/* Donation Details Modal */}
-          <DonationDetailsModal
-            donation={selectedDonation}
-            isOpen={isModalOpen}
-            onClose={handleCloseModal}
+          <EnhancedStatCard
+            icon={CreditCardIcon}
+            title="Via JazzCash"
+            value={stats.viaJazzCash}
+            loading={statsLoading}
+            error={statsError}
+            onClick={() => handleStatCardClick('jazzcash')}
+          />
+          <EnhancedStatCard
+            icon={CreditCardIcon}
+            title="Via Easypaisa"
+            value={stats.viaEasypaisa}
+            loading={statsLoading}
+            error={statsError}
+            onClick={() => handleStatCardClick('easypaisa')}
           />
         </div>
-      </AdminLayout>
+
+        {/* Filter Bar */}
+        <DonationFilterBar
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          activeFilter={activeFilter}
+          onClearFilter={handleClearFilter}
+        />
+
+        {/* Donations Table with smooth loading */}
+        <DonationsTable
+          donations={donations}
+          loading={loading}
+          error={error}
+          onView={handleViewDonation}
+          totalCount={totalCount}
+          filteredCount={filteredCount}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
+
+        {/* Donation Details Modal */}
+        <DonationDetailsModal
+          donation={selectedDonation}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
+      </div>
     </DonationsErrorBoundary>
   );
 };

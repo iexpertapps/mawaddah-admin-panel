@@ -9,6 +9,7 @@ import Settings from "../../pages/admin/Settings";
 import Profile from "../../pages/admin/Profile";
 import NotFound from "../../pages/NotFound";
 import ErrorBoundary from "../ErrorBoundary";
+import WalletPage from '../../pages/admin/wallet';
 
 export const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ export const router = createBrowserRouter([
       {
         path: "profile",
         element: <Profile />,
+      },
+      {
+        path: 'wallet',
+        element: <WalletPage />,
       },
     ],
   },

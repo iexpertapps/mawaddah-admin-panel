@@ -933,7 +933,7 @@ const Users = () => {
   }
 
   return (
-    <AdminLayout pageTitle="Users Management">
+    <>
       {/* Islamic Motif Header */}
       <div className="flex items-center justify-center mb-8">
         <div className="text-center">
@@ -1095,7 +1095,7 @@ const Users = () => {
           <ChangePasswordForm user={passwordUser} onSuccess={() => setShowPasswordModal(false)} />
         </Modal>
       )}
-    </AdminLayout>
+    </>
   )
 }
 

@@ -673,230 +673,228 @@ const Appeals = () => {
 
   return (
     <AppealsErrorBoundary>
-      <AdminLayout pageTitle="Appeals">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="space-y-6"
+      >
+        {/* Page Header */}
         <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="flex items-center justify-between"
         >
-          {/* Page Header */}
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="flex items-center justify-between"
-          >
-            <div>
-              <Heading size="xl">Appeals</Heading>
-              <Text className="text-gray-600 dark:text-gray-400 mt-1">
-                Manage and review user appeals
-              </Text>
-            </div>
-          </motion.div>
-
-          {/* Enhanced Stats Cards with smooth animations */}
-          <div className="flex flex-wrap gap-4">
-            <AnimatePresence mode="wait">
-              {loading ? (
-                <motion.div
-                  key="loading-stats"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex flex-wrap gap-4 w-full"
-                >
-                  <SkeletonStats />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="stats-loaded"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex flex-wrap gap-4 w-full"
-                >
-                  <div className="flex-1 min-w-[200px] max-w-[300px]">
-                    <EnhancedStatCard
-                      title="Total Appeals"
-                      value={globalStats.total}
-                      icon={<ExclamationTriangleIcon className="w-6 h-6" />}
-                      loading={loading}
-                      onClick={() => handleStatClick('all')}
-                      isActive={activeFilter === 'all'}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-[200px] max-w-[300px]">
-                    <EnhancedStatCard
-                      title="Pending"
-                      value={globalStats.pending}
-                      icon={<ClockIcon className="w-6 h-6" />}
-                      loading={loading}
-                      color="yellow"
-                      onClick={() => handleStatClick('pending')}
-                      isActive={activeFilter === 'pending'}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-[200px] max-w-[300px]">
-                    <EnhancedStatCard
-                      title="Approved"
-                      value={globalStats.approved}
-                      icon={<CheckCircleIcon className="w-6 h-6" />}
-                      loading={loading}
-                      color="green"
-                      onClick={() => handleStatClick('approved')}
-                      isActive={activeFilter === 'approved'}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-[200px] max-w-[300px]">
-                    <EnhancedStatCard
-                      title="Rejected"
-                      value={globalStats.rejected}
-                      icon={<XCircleIcon className="w-6 h-6" />}
-                      loading={loading}
-                      color="red"
-                      onClick={() => handleStatClick('rejected')}
-                      isActive={activeFilter === 'rejected'}
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          <div>
+            <Heading size="xl">Appeals</Heading>
+            <Text className="text-gray-600 dark:text-gray-400 mt-1">
+              Manage and review user appeals
+            </Text>
           </div>
-
-          {/* Enhanced Filters with smooth transitions */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
-          >
-            <div className="flex flex-col sm:flex-row gap-4">
-              {/* Search */}
-              <div className="flex-1">
-                <div className="relative">
-                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search appeals..."
-                    value={filters.search}
-                    onChange={(e) => handleFilterChange('search', e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              {/* Status Filter */}
-              <div className="sm:w-48">
-                <select
-                  value={filters.status}
-                  onChange={(e) => handleFilterChange('status', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">All Status</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-
-              {/* Type Filter */}
-              <div className="sm:w-48">
-                <select
-                  value={filters.type}
-                  onChange={(e) => handleFilterChange('type', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="all">All Types</option>
-                  <option value="house_rent">House Rent</option>
-                  <option value="school_fee">School Fee</option>
-                  <option value="medical">Medical</option>
-                  <option value="utility_bills">Utility Bills</option>
-                  <option value="debt">Debt</option>
-                  <option value="business_support">Business Support</option>
-                  <option value="death_support">Death Support</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              {/* Clear Filters Button */}
-              {(filters.search !== '' || filters.status !== 'all' || filters.type !== 'all') && (
-                <div className="sm:w-auto">
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      setFilters({
-                        search: '',
-                        status: 'all',
-                        type: 'all'
-                      })
-                      setCurrentPage(1)
-                    }}
-                    className="w-full sm:w-auto h-[42px] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent flex items-center justify-center gap-x-1.5 text-center hover:text-gray-700 dark:hover:text-gray-50 transition-colors"
-                  >
-                    <XMarkIcon className="w-4 h-4" />
-                    <span className="text-sm font-medium">Clear Filters</span>
-                  </Button>
-                </div>
-              )}
-            </div>
-          </motion.div>
-
-          {/* Enhanced Appeals Table with smooth animations */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <AnimatePresence mode="wait">
-              {loading ? (
-                <motion.div
-                  key="loading-table"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="p-6"
-                >
-                  <SkeletonTable />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="table-loaded"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <AppealsTable
-                    appeals={appeals}
-                    loading={loading}
-                    error={error}
-                    onView={handleViewAppeal}
-                    onApprove={handleApprove}
-                    onReject={handleReject}
-                    totalCount={totalCount}
-                    currentPage={currentPage}
-                    pageSize={pageSize}
-                    onPageChange={handlePageChange}
-                    onPageSizeChange={handlePageSizeChange}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Appeal Details Modal */}
-          <AppealDetailsModal
-            appeal={selectedAppeal}
-            isOpen={isModalOpen}
-            onClose={handleCloseModal}
-            onApprove={handleApprove}
-            onReject={handleReject}
-            onCancel={handleCancel}
-            loading={actionLoading}
-          />
         </motion.div>
-      </AdminLayout>
+
+        {/* Enhanced Stats Cards with smooth animations */}
+        <div className="flex flex-wrap gap-4">
+          <AnimatePresence mode="wait">
+            {loading ? (
+              <motion.div
+                key="loading-stats"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-wrap gap-4 w-full"
+              >
+                <SkeletonStats />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="stats-loaded"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-wrap gap-4 w-full"
+              >
+                <div className="flex-1 min-w-[200px] max-w-[300px]">
+                  <EnhancedStatCard
+                    title="Total Appeals"
+                    value={globalStats.total}
+                    icon={<ExclamationTriangleIcon className="w-6 h-6" />}
+                    loading={loading}
+                    onClick={() => handleStatClick('all')}
+                    isActive={activeFilter === 'all'}
+                  />
+                </div>
+                <div className="flex-1 min-w-[200px] max-w-[300px]">
+                  <EnhancedStatCard
+                    title="Pending"
+                    value={globalStats.pending}
+                    icon={<ClockIcon className="w-6 h-6" />}
+                    loading={loading}
+                    color="yellow"
+                    onClick={() => handleStatClick('pending')}
+                    isActive={activeFilter === 'pending'}
+                  />
+                </div>
+                <div className="flex-1 min-w-[200px] max-w-[300px]">
+                  <EnhancedStatCard
+                    title="Approved"
+                    value={globalStats.approved}
+                    icon={<CheckCircleIcon className="w-6 h-6" />}
+                    loading={loading}
+                    color="green"
+                    onClick={() => handleStatClick('approved')}
+                    isActive={activeFilter === 'approved'}
+                  />
+                </div>
+                <div className="flex-1 min-w-[200px] max-w-[300px]">
+                  <EnhancedStatCard
+                    title="Rejected"
+                    value={globalStats.rejected}
+                    icon={<XCircleIcon className="w-6 h-6" />}
+                    loading={loading}
+                    color="red"
+                    onClick={() => handleStatClick('rejected')}
+                    isActive={activeFilter === 'rejected'}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Enhanced Filters with smooth transitions */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+        >
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1">
+              <div className="relative">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search appeals..."
+                  value={filters.search}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            {/* Status Filter */}
+            <div className="sm:w-48">
+              <select
+                value={filters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            {/* Type Filter */}
+            <div className="sm:w-48">
+              <select
+                value={filters.type}
+                onChange={(e) => handleFilterChange('type', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">All Types</option>
+                <option value="house_rent">House Rent</option>
+                <option value="school_fee">School Fee</option>
+                <option value="medical">Medical</option>
+                <option value="utility_bills">Utility Bills</option>
+                <option value="debt">Debt</option>
+                <option value="business_support">Business Support</option>
+                <option value="death_support">Death Support</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            {/* Clear Filters Button */}
+            {(filters.search !== '' || filters.status !== 'all' || filters.type !== 'all') && (
+              <div className="sm:w-auto">
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setFilters({
+                      search: '',
+                      status: 'all',
+                      type: 'all'
+                    })
+                    setCurrentPage(1)
+                  }}
+                  className="w-full sm:w-auto h-[42px] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent flex items-center justify-center gap-x-1.5 text-center hover:text-gray-700 dark:hover:text-gray-50 transition-colors"
+                >
+                  <XMarkIcon className="w-4 h-4" />
+                  <span className="text-sm font-medium">Clear Filters</span>
+                </Button>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Enhanced Appeals Table with smooth animations */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <AnimatePresence mode="wait">
+            {loading ? (
+              <motion.div
+                key="loading-table"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="p-6"
+              >
+                <SkeletonTable />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="table-loaded"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <AppealsTable
+                  appeals={appeals}
+                  loading={loading}
+                  error={error}
+                  onView={handleViewAppeal}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
+                  totalCount={totalCount}
+                  currentPage={currentPage}
+                  pageSize={pageSize}
+                  onPageChange={handlePageChange}
+                  onPageSizeChange={handlePageSizeChange}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Appeal Details Modal */}
+        <AppealDetailsModal
+          appeal={selectedAppeal}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          onCancel={handleCancel}
+          loading={actionLoading}
+        />
+      </motion.div>
     </AppealsErrorBoundary>
   )
 }

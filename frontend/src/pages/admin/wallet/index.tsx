@@ -17,22 +17,20 @@ function ErrorFallback() {
 
 const AdminWalletPage = () => (
   <ProtectedRoute allowedRoles={['admin']}>
-    <AdminLayout>
-      <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <div className="container mx-auto py-8">
-          <Heading as="h1" size="3xl" className="mb-2">Wallet Management</Heading>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Monitor wallet transactions, balances, and disbursements with full visibility and controls.
-          </p>
-          <WalletStatCards />
-          <div className="mt-8">
-            <Card>
-              <WalletsTableDemo />
-            </Card>
-          </div>
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <div className="container mx-auto py-8">
+        <Heading as="h1" size="3xl" className="mb-2">Wallet Management</Heading>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
+          Monitor wallet transactions, balances, and disbursements with full visibility and controls.
+        </p>
+        <WalletStatCards />
+        <div className="mt-8">
+          <Card>
+            <WalletsTableDemo />
+          </Card>
         </div>
-      </ErrorBoundary>
-    </AdminLayout>
+      </div>
+    </ErrorBoundary>
   </ProtectedRoute>
 );
 
