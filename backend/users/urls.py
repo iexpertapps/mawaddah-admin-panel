@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from users.views import UserViewSet
-from users.views.auth import login_view, logout_view, me_view
+from users.views.auth import login_view, logout_view, me_view, mock_auth_view
 from users.views.user import AdminProfileView, ChangePasswordView
 
 app_name = 'users'
@@ -16,4 +16,5 @@ urlpatterns = [
     path('auth/login/', login_view, name='login'),
     path('auth/logout/', logout_view, name='logout'),
     path('auth/me/', me_view, name='me'),
+    path('auth/mock/', mock_auth_view, name='mock-auth'),  # TEMPORARY: For testing
 ] 
