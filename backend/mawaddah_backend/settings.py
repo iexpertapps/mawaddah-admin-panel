@@ -10,10 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 from decouple import config
-import os
 import dj_database_url
+
+# Force DEBUG to False on Railway - this must be at the very top
+if any(key.startswith('RAILWAY_') for key in os.environ.keys()):
+    os.environ['DEBUG'] = 'False'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,19 +27,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-jc2mx(-@)5=av^t5ai5f34g^)q^5mk2e3)g+)9k!p6)bnjs1t6')
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-your-secret-key-here')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Updated for Railway deployment - force redeploy
 # Force DEBUG to False in production regardless of environment variables
 
 # Check if we're in production (Railway sets RAILWAY_ENVIRONMENT)
-import os
-
-# Force override DEBUG environment variable on Railway
-if any(key.startswith('RAILWAY_') for key in os.environ.keys()):
-    os.environ['DEBUG'] = 'False'
-
 RAILWAY_ENVIRONMENT = os.environ.get('RAILWAY_ENVIRONMENT', None)
 
 # Force DEBUG to False on Railway
