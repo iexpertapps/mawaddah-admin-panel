@@ -80,3 +80,7 @@ urlpatterns += [
     path('api/health', health_check, name='api_health_no_slash'),
     path('api/health/', health_check, name='api_health_slash'),
 ]
+
+urlpatterns = [
+    path('', health_check, name='root-healthcheck'),
+] + urlpatterns

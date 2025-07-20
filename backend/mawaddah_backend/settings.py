@@ -260,7 +260,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-APPEND_SLASH = True
+APPEND_SLASH = False
 
 # Security settings for production
 if not DEBUG:
