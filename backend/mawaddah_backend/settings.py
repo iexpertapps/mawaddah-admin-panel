@@ -26,6 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-jc2mx(-@)5=av^t5ai5f34g^)q^5mk2e3)g+)9k!p6)bnjs1t6')
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# Updated for Railway deployment - force redeploy
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS_RAW = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,healthcheck.railway.app,mawaddahapp.up.railway.app')
