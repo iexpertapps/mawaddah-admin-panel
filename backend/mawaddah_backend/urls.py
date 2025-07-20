@@ -53,6 +53,8 @@ def root_view(request):
     return JsonResponse({"status": "Mawaddah API is Live", "version": "1.0"})
 
 urlpatterns = [
+    path('api/health', health_check, name='api_health_no_slash'),
+    path('api/health/', health_check, name='api_health_slash'),
     path('', health_check, name='root-health-check'),  # Root path for Railway healthcheck
     path('admin/', admin.site.urls),
     path('api/admin/profile/', AdminProfileView.as_view(), name='admin-profile'),
@@ -68,18 +70,12 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/settings/', include('settings.urls')),
     path('api/debug/env/', debug_env, name='debug_env'),
-    path('health/', health_check, name='health_check'),
 ]
 
 # Serve static and media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-urlpatterns += [
-    path('api/health', health_check, name='api_health_no_slash'),
-    path('api/health/', health_check, name='api_health_slash'),
-]
 
 urlpatterns = [
     path('', health_check, name='root-healthcheck'),
