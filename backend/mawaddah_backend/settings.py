@@ -15,6 +15,11 @@ from pathlib import Path
 from decouple import config
 import dj_database_url
 
+# --- FORCE DEBUG TO FALSE IN PRODUCTION ---
+os.environ['DEBUG'] = 'False'
+DEBUG = False
+# -----------------------------------------
+
 # Force DEBUG to False on Railway - this must be at the very top
 if any(key.startswith('RAILWAY_') for key in os.environ.keys()):
     os.environ['DEBUG'] = 'False'
