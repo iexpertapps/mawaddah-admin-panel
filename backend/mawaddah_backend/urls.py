@@ -49,7 +49,11 @@ def health_check(request):
     """Simple health check endpoint for Railway"""
     return JsonResponse({'status': 'healthy', 'message': 'Django app is running'})
 
+def root_view(request):
+    return JsonResponse({"status": "Mawaddah API is Live", "version": "1.0"})
+
 urlpatterns = [
+    path('', root_view),
     path('admin/', admin.site.urls),
     path('api/admin/profile/', AdminProfileView.as_view(), name='admin-profile'),
     path('api/', include(router.urls)),
