@@ -39,9 +39,12 @@ class UserViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         return UserSerializer
 
     def perform_create(self, serializer):
+        if not self.request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
         user = self.request.user
         # Only allow admin to create users
-        if not user.is_authenticated or user.role != 'admin':
+        if user.role != 'admin':
             raise PermissionDenied('Only admins can create users.')
         # Only allow creation of shura members
         role = self.request.data.get('role', None)  # type: ignore
@@ -50,6 +53,9 @@ class UserViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         serializer.save()
 
     def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return User.objects.none()
+            
         queryset = super().get_queryset()
         role = self.request.query_params.get('role')
         if role:
@@ -75,20 +81,18 @@ class UserViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         return queryset
 
     def get_permissions(self):
-        # Only allow update if user is owner or admin
-        if self.action in ['update', 'partial_update', 'set_password']:
-            return [AllowAny(), IsAdminOrOwnerOrReadOnly()]
         return [AllowAny()]
 
     def list(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
         import logging
         logger = logging.getLogger(__name__)
         try:
             return super().list(request, *args, **kwargs)
         except Exception as e:
             logger.error(f"Error in UserViewSet.list: {str(e)}", exc_info=True)
-            from rest_framework.response import Response
-            from rest_framework import status
             return Response(
                 {"detail": "Internal Server Error", "error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -99,6 +103,9 @@ class UserViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         """
         Return the current authenticated user's profile.
         """
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
@@ -107,10 +114,13 @@ class UserViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         """
         Set a new password for a user. Only admins can reset passwords.
         """
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
         user = self.get_object()
         
         # Only allow admins to reset passwords
-        if not request.user.is_authenticated or request.user.role != 'admin':
+        if request.user.role != 'admin':
             raise PermissionDenied('Only admins can reset user passwords.')
         
         password = request.data.get('password')
@@ -147,9 +157,15 @@ class UserViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
         ) 
 
 class AdminProfileView(APIView):
-    permission_classes = [AllowAny, IsAdmin]
+    permission_classes = [AllowAny]
 
     def get(self, request):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        if not request.user.role == 'admin':
+            return Response({"detail": "Admin access required"}, status=status.HTTP_403_FORBIDDEN)
+            
         user = request.user
         serializer = AdminProfileSerializer(user)
         return Response({
@@ -160,12 +176,16 @@ class AdminProfileView(APIView):
 
     @transaction.atomic
     def patch(self, request):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        if not request.user.role == 'admin':
+            return Response({"detail": "Admin access required"}, status=status.HTTP_403_FORBIDDEN)
+            
         user = request.user
         serializer = AdminProfileSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            # Audit log signal (assume signal is connected elsewhere)
-            # audit_log.send(...)
             return Response({
                 'success': True,
                 'data': serializer.data,
@@ -181,6 +201,9 @@ class ChangePasswordView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
         user = request.user
         current_password = request.data.get('current_password')
         new_password = request.data.get('new_password')

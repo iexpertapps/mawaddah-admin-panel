@@ -9,15 +9,19 @@ from django.utils import timezone
 from django.db.models import Count, Avg, Q, F, Sum
 from datetime import timedelta
 import logging
+from rest_framework import status
 
 class IsAdminOnly(IsAuthenticated):
     def has_permission(self, request, view):
         return super().has_permission(request, view) and (getattr(request.user, 'role', None) == 'admin' or request.user.is_superuser)
 
 class DashboardStatsView(APIView):
-    permission_classes = [AllowAny]  # Temporarily allow all
+    permission_classes = [AllowAny]
 
     def get(self, request):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+
         now = timezone.now()
         period = request.GET.get('period', '30')
         
@@ -116,9 +120,12 @@ class DashboardStatsView(APIView):
         })
 
 class ShuraSummaryView(APIView):
-    permission_classes = [AllowAny]  # Temporarily allow all
+    permission_classes = [AllowAny]
 
     def get(self, request):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+
         now = timezone.now()
         # Total debit transactions (withdrawals)
         total_withdrawals = WalletTransaction.objects.filter(type='debit').count()
@@ -149,9 +156,12 @@ class ShuraSummaryView(APIView):
         })
 
 class RecentActivityView(APIView):
-    permission_classes = [AllowAny]  # Temporarily allow all
+    permission_classes = [AllowAny]
 
     def get(self, request):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+
         """Get recent activity for the dashboard"""
         from datetime import timedelta
         from django.utils import timezone
@@ -248,9 +258,12 @@ class RecentActivityView(APIView):
             return Response({'activities': []}, status=200)
 
 class WalletStatsView(APIView):
-    permission_classes = [AllowAny]  # Temporarily allow all
+    permission_classes = [AllowAny]
 
     def get(self, request):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+
         """Get wallet statistics for the current user"""
         user = request.user
         
