@@ -88,4 +88,4 @@ The [`frontend/`](../frontend) directory contains a scaffolded Next.js 14 projec
 
 ---
 
-For questions or contributions, please open an issue or pull request. 
+For questions or contributions, please open an issue or pull request. # Trigger Railway redeploy
