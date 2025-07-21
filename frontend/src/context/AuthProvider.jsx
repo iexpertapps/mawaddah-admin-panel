@@ -10,16 +10,14 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = () => {
       const storedToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-      if (storedToken) {
-        const storedUser = localStorage.getItem('user') || sessionStorage.getItem('user');
+      const storedUser = localStorage.getItem('user') || sessionStorage.getItem('user');
+      if (storedToken && storedUser && storedToken !== 'undefined' && storedUser !== 'undefined') {
         setToken(storedToken);
         api.defaults.headers.common['Authorization'] = `Token ${storedToken}`;
-        if (storedUser) {
-          try {
-            setUser(JSON.parse(storedUser));
-          } catch (e) {
-            setUser(null);
-          }
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (e) {
+          setUser(null);
         }
       }
       setLoading(false);
@@ -30,22 +28,24 @@ const AuthProvider = ({ children }) => {
   const login = async (email, password, rememberMe) => {
     try {
       const response = await api.post('/api/auth/login/', { email, password });
-      const { token: apiToken, user: apiUser } = response.data;
+      const { token, user } = response.data;
 
-      setUser(apiUser);
-      setToken(apiToken);
-      api.defaults.headers.common['Authorization'] = `Token ${apiToken}`;
+      if (!token || !user) {
+        return { success: false, error: 'Invalid login response from server. Please contact support.' };
+      }
 
-      const userString = JSON.stringify(apiUser);
+      setUser(user);
+      setToken(token);
+      api.defaults.headers.common['Authorization'] = `Token ${token}`;
+
+      const userString = JSON.stringify(user);
       if (rememberMe) {
-        localStorage.setItem('authToken', apiToken);
+        localStorage.setItem('authToken', token);
         localStorage.setItem('user', userString);
       } else {
-        sessionStorage.setItem('authToken', apiToken);
+        sessionStorage.setItem('authToken', token);
         sessionStorage.setItem('user', userString);
       }
-      
-      // Navigation removed; let the caller handle it
       return { success: true };
     } catch (error) {
       let errorMessage = "An unexpected error occurred.";
@@ -70,7 +70,6 @@ const AuthProvider = ({ children }) => {
       sessionStorage.removeItem('authToken');
       sessionStorage.removeItem('user');
       delete api.defaults.headers.common['Authorization'];
-      // Navigation removed; let the caller handle it
     }
   };
 
