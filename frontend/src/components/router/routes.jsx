@@ -17,7 +17,7 @@ import AuthContext from '../../context/AuthContext';
 // A component to handle root redirection
 const RootRedirect = () => {
   const context = useContext(AuthContext);
-  if (!context) return null; // or a loading spinner
+  if (!context) return <div>Loading...</div>; // Never return null from a route element
   const { isAuthenticated } = context;
   return <Navigate to={isAuthenticated ? "/admin" : "/login"} replace />;
 };
