@@ -11,7 +11,7 @@ import NotFound from "../../pages/NotFound";
 import ErrorBoundary from "../ErrorBoundary";
 import WalletPage from '../../pages/admin/wallet';
 import ProtectedRoute from './ProtectedRoute';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../context/AuthContext';
 
 // A component to handle root redirection
 const RootRedirect = () => {
