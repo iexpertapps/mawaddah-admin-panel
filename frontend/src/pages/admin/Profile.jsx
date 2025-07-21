@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import MawaddahAvatar from '../../components/atoms/mawaddah/MawaddahAvatar';
 import { MawaddahInput, MawaddahSelect, MawaddahButton } from '../../components/atoms/mawaddah';
 import Modal from '../../components/molecules/Modal';
-import { useAuth } from '../../context/AuthContext';
+import useAuth from '../../context/useAuth';
 import { useToast } from '../../hooks/useToast';
 import { useNavigate } from 'react-router-dom';
 import { User as UserIcon, Lock as LockIcon, Mail, Shield, Clock, ChevronDown, Phone, ArrowLeft } from 'lucide-react';

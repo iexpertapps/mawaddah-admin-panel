@@ -4,7 +4,7 @@ import { Card, Button, Switch } from '../../components/atoms';
 import Skeleton from '../../components/atoms/Skeleton';
 import { AlertTriangle } from 'lucide-react';
 import { Heading, Text } from '../../components/atoms/typography';
-import { useAuth } from '../../context/AuthContext';
+import useAuth from '../../context/useAuth';
 import { format, formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { CheckCircle } from 'lucide-react';

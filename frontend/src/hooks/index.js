@@ -1,6 +1,6 @@
 // Custom React hooks
 // Examples: useAuth, useApi, useLocalStorage, etc. 
-export { useAuth } from '../context/AuthContext'
+export { default as useAuth } from '../context/useAuth'
 export { useDashboardStats } from './useDashboardStats'
 export { useStatTotalUsers } from './useStatTotalUsers'
 export { useStatTotalDonors } from './useStatTotalDonors'

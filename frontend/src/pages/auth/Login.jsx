@@ -4,7 +4,7 @@ import { Button } from '../../components/atoms/Button';
 import MawaddahInput from '../../components/atoms/mawaddah/MawaddahInput';
 import { Heading, Text } from '../../components/atoms/typography';
 import { useTheme } from '../../context/ThemeContext';
-import { useAuth } from '../../context/AuthContext'; // Import the unified auth hook
+import useAuth from '../../context/useAuth'; // Import the unified auth hook
 
 const Login = () => {
   const { theme, isDark } = useTheme();
