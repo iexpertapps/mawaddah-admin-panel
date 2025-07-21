@@ -138,12 +138,20 @@ REST_FRAMEWORK = {
 }
 
 # --- CORS and CSRF Settings ---
-cors_origins_str = config('CORS_ALLOWED_ORIGINS', default='http://localhost:5173,http://127.0.0.1:5173')
-CORS_ALLOWED_ORIGINS = cors_origins_str.split(',') if isinstance(cors_origins_str, str) else []
+CORS_ALLOWED_ORIGINS = [
+    "https://mawaddahapp.vercel.app",
+    "https://mawaddahapp.up.railway.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 CORS_ALLOW_CREDENTIALS = True
 
-csrf_trusted_origins_str = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:5173,http://127.0.0.1:5173')
-CSRF_TRUSTED_ORIGINS = csrf_trusted_origins_str.split(',') if isinstance(csrf_trusted_origins_str, str) else []
+CSRF_TRUSTED_ORIGINS = [
+    "https://mawaddahapp.vercel.app",
+    "https://mawaddahapp.up.railway.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 
 # --- Production Security Settings (Enabled when DEBUG is False) ---
 if not DEBUG:
