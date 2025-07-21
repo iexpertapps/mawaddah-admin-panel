@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../useAuth';
+import { useAuth } from '../../context/AuthContext';
 
 export interface WalletTransaction {
   id: number;
   amount: number;
   transaction_type: 'credit' | 'debit';
+  type: string;
   description: string;
   created_at: string;
+  timestamp: string;
   status: 'completed' | 'pending' | 'failed';
+  appeal_id?: number;
+  donor_name?: string;
 }
 
 export interface WalletBalance {
@@ -17,7 +21,7 @@ export interface WalletBalance {
 }
 
 export function useRecipientWallet() {
-  const { user } = useAuth();
+  const { user } = useAuth() as any;
   const [balance, setBalance] = useState<WalletBalance | null>(null);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [loading, setLoading] = useState(true);

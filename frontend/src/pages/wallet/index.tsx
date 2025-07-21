@@ -3,19 +3,35 @@ import ProtectedRoute from '@/components/router/ProtectedRoute';
 import StatCard from '@/components/molecules/StatCard';
 import AdminTable from '@/components/molecules/AdminTable';
 import Drawer from '@/components/molecules/Drawer';
-import EmptyState from '@/components/molecules/EmptyState';
+// import EmptyState from '@/components/molecules/EmptyState';
 import Skeleton from '@/components/atoms/Skeleton';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
-import { toast } from '@/hooks/useToast';
+import { useToast } from '@/hooks/useToast';
 import { formatCurrencyShort } from '@/utils';
-import apiClient from '@/services';
+import api from '@/services/api';
 
 const PAGE_SIZE = 10;
 
+type Recipient = {
+  id: number;
+  name: string;
+  email: string;
+  total_received: number;
+  total_withdrawn: number;
+  current_balance: number;
+};
+
+type DrawerData = {
+  date: string;
+  amount: number;
+  transferred_by?: string;
+};
+
 function WalletAdminAnalyticsPage() {
-  const [stats, setStats] = useState(null);
+  const { toast } = useToast();
+  const [stats, setStats] = useState<any>(null);
   const [loadingStats, setLoadingStats] = useState(true);
-  const [recipients, setRecipients] = useState([]);
+  const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [loadingTable, setLoadingTable] = useState(true);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -24,18 +40,18 @@ function WalletAdminAnalyticsPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerType, setDrawerType] = useState(''); // 'withdrawals' | 'transfers'
   const [drawerTitle, setDrawerTitle] = useState('');
-  const [drawerData, setDrawerData] = useState([]);
+  const [drawerData, setDrawerData] = useState<DrawerData[]>([]);
   const [drawerLoading, setDrawerLoading] = useState(false);
-  const [drawerUserId, setDrawerUserId] = useState(null);
+  const [drawerUserId, setDrawerUserId] = useState<number | null>(null);
 
   // Fetch stat cards
   useEffect(() => {
     setLoadingStats(true);
-    apiClient.get('/api/wallet/admin/overview/')
+    api.get('/api/wallet/admin/overview/')
       .then(res => setStats(res.data))
       .catch(() => toast.error('Failed to load wallet data.'))
       .finally(() => setLoadingStats(false));
-  }, []);
+  }, [toast]);
 
   // Debounce search
   useEffect(() => {
@@ -46,7 +62,7 @@ function WalletAdminAnalyticsPage() {
   // Fetch recipients
   const fetchRecipients = useCallback(() => {
     setLoadingTable(true);
-    apiClient.get('/api/wallet/admin/recipients/', {
+    api.get('/api/wallet/admin/recipients/', {
       params: {
         page,
         page_size: PAGE_SIZE,
@@ -59,14 +75,14 @@ function WalletAdminAnalyticsPage() {
       })
       .catch(() => toast.error('Failed to load wallet data.'))
       .finally(() => setLoadingTable(false));
-  }, [page, debouncedSearch]);
+  }, [page, debouncedSearch, toast]);
 
   useEffect(() => {
     fetchRecipients();
   }, [fetchRecipients]);
 
   // Drawer handlers
-  const openDrawer = (userId, type) => {
+  const openDrawer = (userId: number, type: string) => {
     setDrawerUserId(userId);
     setDrawerType(type);
     setDrawerTitle(type === 'withdrawals' ? 'Withdrawal History' : 'Transfer History');
@@ -75,7 +91,7 @@ function WalletAdminAnalyticsPage() {
     const url = type === 'withdrawals'
       ? `/api/wallet/admin/recipients/${userId}/withdrawals/`
       : `/api/wallet/admin/recipients/${userId}/transfers/`;
-    apiClient.get(url)
+    api.get(url)
       .then(res => setDrawerData(res.data))
       .catch(() => toast.error('Failed to load wallet data.'))
       .finally(() => setDrawerLoading(false));
@@ -92,43 +108,43 @@ function WalletAdminAnalyticsPage() {
   // Table columns
   const columns = [
     {
-      Header: 'Name',
-      accessor: 'name',
-      Cell: ({ value }) => value,
+      key: 'name',
+      title: 'Name',
+      render: (row: Recipient) => row.name,
     },
     {
-      Header: 'Email',
-      accessor: 'email',
-      Cell: ({ value }) => value,
+      key: 'email',
+      title: 'Email',
+      render: (row: Recipient) => row.email,
     },
     {
-      Header: 'Total Received',
-      accessor: 'total_received',
-      Cell: ({ value, row }) => (
+      key: 'total_received',
+      title: 'Total Received',
+      render: (row: Recipient) => (
         <button
           className="text-green-700 font-semibold hover:underline focus:outline-none"
-          onClick={() => openDrawer(row.original.id, 'transfers')}
+          onClick={() => openDrawer(row.id, 'transfers')}
         >
-          Rs {formatCurrencyShort(value)}
+          Rs {formatCurrencyShort(row.total_received)}
         </button>
       ),
     },
     {
-      Header: 'Withdrawn',
-      accessor: 'total_withdrawn',
-      Cell: ({ value, row }) => (
+      key: 'total_withdrawn',
+      title: 'Withdrawn',
+      render: (row: Recipient) => (
         <button
           className="text-yellow-700 font-semibold hover:underline focus:outline-none"
-          onClick={() => openDrawer(row.original.id, 'withdrawals')}
+          onClick={() => openDrawer(row.id, 'withdrawals')}
         >
-          Rs {formatCurrencyShort(value)}
+          Rs {formatCurrencyShort(row.total_withdrawn)}
         </button>
       ),
     },
     {
-      Header: 'Balance',
-      accessor: 'current_balance',
-      Cell: ({ value }) => `Rs ${formatCurrencyShort(value)}`,
+      key: 'current_balance',
+      title: 'Balance',
+      render: (row: Recipient) => `Rs ${formatCurrencyShort(row.current_balance)}`,
     },
   ];
 
@@ -170,13 +186,21 @@ function WalletAdminAnalyticsPage() {
   ];
 
   return (
-    <ProtectedRoute role="admin">
+    <ProtectedRoute>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-1">Wallet Analytics</h1>
         <p className="text-gray-600 mb-6">Monitor recipient wallet activity, balance, and transaction records.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {statCards.map(card => (
-            <StatCard key={card.label} label={card.label} value={card.value} color={card.color} />
+            <StatCard
+              key={card.label}
+              title={card.label}
+              value={card.value}
+              icon={null}
+              subtext={undefined}
+              trend={undefined}
+              onClick={undefined}
+            />
           ))}
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
@@ -198,19 +222,21 @@ function WalletAdminAnalyticsPage() {
               <Skeleton className="h-6 w-full mb-2" />
             </div>
           ) : recipients.length === 0 ? (
-            <EmptyState message="No recipients found." />
+            // <EmptyState message="No recipients found." />
+            <div className="p-8 text-center text-gray-500">No recipients found.</div>
           ) : (
-            <AdminTable columns={columns} data={recipients} />
+            <AdminTable columns={columns as any} data={recipients as any} />
           )}
         </div>
         <Pagination />
-        <Drawer open={drawerOpen} onClose={closeDrawer} title={drawerTitle} fullWidthOnMobile>
+        <Drawer isOpen={drawerOpen} onClose={closeDrawer} title={drawerTitle}>
           {drawerLoading ? (
             <div className="p-8 flex justify-center items-center">
               <Skeleton className="h-6 w-32" />
             </div>
           ) : drawerData.length === 0 ? (
-            <EmptyState message="No transactions found." />
+            // <EmptyState message="No transactions found." />
+            <div className="p-8 text-center text-gray-500">No transactions found.</div>
           ) : (
             <div className="p-4 space-y-4">
               {drawerData.map((item, idx) => (

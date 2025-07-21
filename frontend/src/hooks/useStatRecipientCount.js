@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useAuth } from './useAuth'
+import { useAuth } from '../context/AuthContext'
 
 export function useStatRecipientCount() {
   const { token } = useAuth()

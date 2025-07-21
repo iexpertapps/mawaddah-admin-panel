@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useAuth } from './useAuth'
+import { useAuth } from '../context/AuthContext'
 
 export const useAppeals = (filters = {}, page = 1, pageSize = 25) => {
   const { token } = useAuth()

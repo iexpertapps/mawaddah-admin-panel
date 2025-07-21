@@ -1,3 +1,14 @@
+// Add Cypress custom command type for loginAs
+/// <reference types="cypress" />
+
+// NOTE: The actual implementation of cy.loginAs should be in cypress/support/commands.js or commands.ts
+
+declare module 'cypress' {
+  interface Chainable {
+    loginAs(email: string, password: string): Chainable;
+  }
+}
+
 describe('Admin Wallet Flow', () => {
   before(() => {
     // Custom command or direct API to login as admin
