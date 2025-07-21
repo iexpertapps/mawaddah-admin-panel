@@ -84,12 +84,6 @@ class UserSerializer(serializers.ModelSerializer):
         val = getattr(obj, 'updated_at', None)
         return val.isoformat() if val else None
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        # Always return roles as an array
-        data['roles'] = [data['role']] if data['role'] else []
-        return data
-
     @staticmethod
     def create_user(validated_data):
         """
