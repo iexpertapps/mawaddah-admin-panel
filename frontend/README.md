@@ -137,3 +137,41 @@ The application is ready for deployment to any static hosting service:
 - Tailwind CSS is configured with custom colors matching the brand
 - ESLint and Prettier are configured for code quality
 # Trigger redeploy
+
+# Authentication Context Usage & Best Practices
+
+## Modular Auth System
+
+- `AuthContext.js`: React context for authentication data.
+- `AuthProvider.jsx`: Provider component that manages auth state and must wrap your app.
+- `useAuth.js`: Custom hook to access auth context. Throws a clear error if used outside the provider.
+
+## Usage
+
+**Wrap your app in the provider:**
+```jsx
+import AuthProvider from './src/context/AuthProvider';
+
+<AuthProvider>
+  <App />
+</AuthProvider>
+```
+
+**Access auth state in components:**
+```js
+import useAuth from './src/context/useAuth';
+const { user, login, logout, isAuthenticated } = useAuth();
+```
+
+## Error Handling
+- If `useAuth()` is called outside `<AuthProvider>`, a clear error is thrown in development and production.
+- Use an error boundary (see `src/components/ErrorBoundary.jsx`) at the root of your app to catch and display errors gracefully.
+
+## Testing
+- A unit test (`useAuth.test.js`) ensures `useAuth` throws if used outside the provider and works inside it.
+
+## Best Practices
+- Always wrap your app in `<AuthProvider>`.
+- Never call `useAuth()` outside the provider tree.
+- Use error boundaries to prevent white screens in production.
+- Keep context, provider, and hooks modular for maintainability.
