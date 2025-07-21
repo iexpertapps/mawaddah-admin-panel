@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/atoms/Button';
 import MawaddahInput from '../../components/atoms/mawaddah/MawaddahInput';
 import { Heading, Text } from '../../components/atoms/typography';
@@ -9,6 +9,7 @@ import useAuth from '../../context/useAuth'; // Import the unified auth hook
 const Login = () => {
   const { theme, isDark } = useTheme();
   const { login } = useAuth(); // Use the login function from the hook
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -50,9 +51,9 @@ const Login = () => {
     if (!result.success) {
       setFormError(result.error);
       setErrors({ email: true, password: true });
+    } else {
+      navigate('/admin', { replace: true });
     }
-    
-    // The useAuth hook handles navigation on success, so no need to do it here.
     setIsLoading(false);
   };
 

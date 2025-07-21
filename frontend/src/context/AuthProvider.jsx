@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import AuthContext from './AuthContext';
 
@@ -7,7 +6,6 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const initAuth = () => {
@@ -47,7 +45,7 @@ const AuthProvider = ({ children }) => {
         sessionStorage.setItem('user', userString);
       }
       
-      navigate('/admin', { replace: true });
+      // Navigation removed; let the caller handle it
       return { success: true };
     } catch (error) {
       let errorMessage = "An unexpected error occurred.";
@@ -72,7 +70,7 @@ const AuthProvider = ({ children }) => {
       sessionStorage.removeItem('authToken');
       sessionStorage.removeItem('user');
       delete api.defaults.headers.common['Authorization'];
-      navigate('/login', { replace: true });
+      // Navigation removed; let the caller handle it
     }
   };
 
