@@ -11,12 +11,22 @@ import NotFound from "../../pages/NotFound";
 import ErrorBoundary from "../ErrorBoundary";
 import WalletPage from '../../pages/admin/wallet';
 import ProtectedRoute from './ProtectedRoute';
-import { useAuth } from '../../context/AuthContext';
+import React from 'react';
 
 // A component to handle root redirection
 const RootRedirect = () => {
-  const { isAuthenticated } = useAuth();
-  // If authenticated, go to the admin dashboard, otherwise to the login page.
+  // Use a fallback state to avoid SSR mismatch
+  const [checked, setChecked] = React.useState(false);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  React.useEffect(() => {
+    // Dynamically import useAuth to ensure context is available
+    import('../../context/AuthContext').then(({ useAuth }) => {
+      const { isAuthenticated } = useAuth();
+      setIsAuthenticated(isAuthenticated);
+      setChecked(true);
+    });
+  }, []);
+  if (!checked) return null;
   return <Navigate to={isAuthenticated ? "/admin" : "/login"} replace />;
 };
 
