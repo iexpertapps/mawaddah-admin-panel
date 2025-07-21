@@ -1,12 +1,15 @@
 import { RouterProvider } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
+import AuthProvider from './context/AuthProvider';
 import { router } from './components/router/routes';
 
 function App() {
   return (
-    <ThemeProvider>
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 

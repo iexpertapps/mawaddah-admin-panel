@@ -26,11 +26,7 @@ const RootRedirect = () => {
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <AuthProvider>
-        <RootRedirect />
-      </AuthProvider>
-    ),
+    element: <RootRedirect />,
   },
   {
     path: "/login",
@@ -39,11 +35,9 @@ export const router = createBrowserRouter([
   {
     path: "/admin",
     element: (
-      <AuthProvider>
-        <ProtectedRoute allowedRoles={['admin']}>
-          <AdminLayout />
-        </ProtectedRoute>
-      </AuthProvider>
+      <ProtectedRoute allowedRoles={['admin']}>
+        <AdminLayout />
+      </ProtectedRoute>
     ),
     errorElement: <ErrorBoundary />,
     children: [
