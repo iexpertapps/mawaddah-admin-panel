@@ -1,6 +1,6 @@
 import { RouterProvider } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
-import { AuthProvider } from './context/AuthContext'; // Import the new provider
+import AuthProvider from './context/AuthProvider'; // Import the new provider
 import { router } from './components/router/routes';
 
 function App() {
