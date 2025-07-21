@@ -203,7 +203,7 @@ REST_FRAMEWORK = {
 
 # --- SECURITY SETTINGS FOR PRODUCTION ---
 SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', 3600))
-SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'True') == 'True'
+SECURE_SSL_REDIRECT = False  # Disable this as Railway handles SSL
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -249,7 +249,12 @@ CORS_ALLOW_HEADERS = [
 ]
 
 # CSRF Trusted Origins from environment
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if os.getenv('CSRF_TRUSTED_ORIGINS') else []
+CSRF_TRUSTED_ORIGINS = [
+    "https://mawaddahapp.up.railway.app",
+    "https://mawaddahapp.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000"
+]
 
 # Add Railway domains to CSRF trusted origins
 if not DEBUG:
@@ -290,5 +295,8 @@ else:
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# Disable SSL redirect in development
 if os.getenv("LOCAL_DEV", "False") == "True":
     SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
