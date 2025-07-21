@@ -25,6 +25,9 @@ class AppealViewSet(mixins.ListModelMixin,
 
     def get_queryset(self):
         """Add search and filtering support."""
+        if not self.request.user.is_authenticated:
+            return Appeal.objects.none()  # Return empty queryset for unauthenticated users
+            
         queryset = Appeal.objects.all().select_related(
             'created_by', 'beneficiary', 'approved_by', 'rejected_by', 'cancelled_by',
             'linked_donation', 'linked_donation__donor'
@@ -55,6 +58,17 @@ class AppealViewSet(mixins.ListModelMixin,
 
     def get_filtered_stats(self, queryset):
         """Calculate stats for the filtered queryset."""
+        if not self.request.user.is_authenticated:
+            return {
+                'total': 0,
+                'pending': 0,
+                'approved': 0,
+                'rejected': 0,
+                'cancelled': 0,
+                'fulfilled': 0,
+                'expired': 0
+            }
+            
         stats = queryset.aggregate(
             total=Count('id'),
             pending=Count('id', filter=Q(status='pending')),
@@ -68,6 +82,9 @@ class AppealViewSet(mixins.ListModelMixin,
 
     def list(self, request, *args, **kwargs):
         """Enhanced list method with filtered stats."""
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
         
@@ -100,17 +117,12 @@ class AppealViewSet(mixins.ListModelMixin,
         return AppealListSerializer
 
     def get_permissions(self):
-        if self.action == 'create':
-            return [AllowAny(), IsVerifiedRecipientOrShura()]
-        if self.action in ['partial_update', 'update']:
-            return [AllowAny(), IsShuraApprover()]
-        if self.action in ['my_appeals']:
-            return [AllowAny()]
-        if self.action in ['reviewable']:
-            return [AllowAny(), IsShuraApprover()]
-        return [AllowAny(), IsOwnerOrReadOnly()]
+        return [AllowAny()]
 
     def perform_create(self, serializer):
+        if not self.request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
         user = self.request.user
         beneficiary = serializer.validated_data.get('beneficiary')
         if user.role == 'shura' and beneficiary:
@@ -119,6 +131,9 @@ class AppealViewSet(mixins.ListModelMixin,
             serializer.save(created_by=user, beneficiary=user)
 
     def perform_update(self, serializer):
+        if not self.request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
         instance = self.get_object()
         old_status = instance.status
         new_status = serializer.validated_data.get('status', old_status)
@@ -157,6 +172,9 @@ class AppealViewSet(mixins.ListModelMixin,
     @action(detail=False, methods=['get'], url_path='my-appeals')
     def my_appeals(self, request):
         """List appeals created by the current user."""
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
         queryset = Appeal.objects.filter(created_by=request.user)
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -168,6 +186,9 @@ class AppealViewSet(mixins.ListModelMixin,
     @action(detail=False, methods=['get'], url_path='reviewable')
     def reviewable(self, request):
         """List appeals visible to Shura for review (pending)."""
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
         queryset = Appeal.objects.filter(status='pending')
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -179,6 +200,9 @@ class AppealViewSet(mixins.ListModelMixin,
     @action(detail=False, methods=['get'], url_path='stats')
     def stats(self, request):
         """Return global stats for all appeals (not filtered)."""
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
         queryset = Appeal.objects.all()
         stats = self.get_filtered_stats(queryset)
         return Response(stats)

@@ -22,6 +22,10 @@ class DonationViewSet(mixins.CreateModelMixin,
         # Exclude only manual and null payment_method donations
         queryset = queryset.exclude(payment_method='manual').exclude(payment_method__isnull=True)
         
+        # Handle unauthenticated users
+        if not user.is_authenticated:
+            return queryset.none()  # Return empty queryset for unauthenticated users
+        
         # Admin can see all donations with filtering
         if user.is_superuser or getattr(user, 'role', None) == 'admin':
             # Apply filters
@@ -65,16 +69,17 @@ class DonationViewSet(mixins.CreateModelMixin,
             return queryset.filter(donor=user)
 
     def get_permissions(self):
-        if self.action in ['retrieve', 'list']:
-            return [AllowAny(), IsDonorOrAdmin()]
-        if self.action == 'create':
-            return [AllowAny(), IsDonorOrAdmin()]
         return [AllowAny()]
 
     def perform_create(self, serializer):
+        if not self.request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
         serializer.save(donor=self.request.user)
 
     def list(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+            
         user = request.user
         
         # Only admin can access with meta stats
