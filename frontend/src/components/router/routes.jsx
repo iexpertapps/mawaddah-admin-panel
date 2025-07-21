@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import AdminLayout from "../layout/AdminLayout";
 import Login from "../../pages/auth/Login";
 import Dashboard from "../../pages/admin/Dashboard";
@@ -11,10 +11,22 @@ import NotFound from "../../pages/NotFound";
 import ErrorBoundary from "../ErrorBoundary";
 import WalletPage from '../../pages/admin/wallet';
 import ProtectedRoute from './ProtectedRoute';
+import { useAuth } from '../../hooks/useAuth';
+
+// A component to handle root redirection
+const RootRedirect = () => {
+  const { isAuthenticated } = useAuth();
+  // If authenticated, go to the admin dashboard, otherwise to the login page.
+  return <Navigate to={isAuthenticated ? "/admin" : "/login"} replace />;
+};
 
 export const router = createBrowserRouter([
   {
     path: "/",
+    element: <RootRedirect />,
+  },
+  {
+    path: "/login",
     element: <Login />,
   },
   {
