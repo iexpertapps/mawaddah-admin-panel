@@ -27,8 +27,11 @@ from wallet.views.dashboard import DashboardStatsView, ShuraSummaryView, RecentA
 from users.views.user import AdminProfileView
 from django.http import JsonResponse
 import os
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
 
 router = DefaultRouter()
+# These viewsets will now require authentication by default
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'appeals', AppealViewSet, basename='appeal')
 router.register(r'donations', DonationViewSet, basename='donation')
@@ -45,10 +48,12 @@ def debug_env(request):
     }
     return JsonResponse(env_vars)
 
+@permission_classes([AllowAny])
 def health_check(request):
     """Simple health check endpoint for Railway"""
     return JsonResponse({'status': 'healthy', 'message': 'Django app is running'})
 
+@permission_classes([AllowAny])
 def root_view(request):
     return JsonResponse({"status": "Mawaddah API is Live", "version": "1.0"})
 
