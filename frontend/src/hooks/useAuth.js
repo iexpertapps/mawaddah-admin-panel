@@ -16,6 +16,8 @@ export const useAuth = () => {
   const login = async (email, password, rememberMe) => {
     try {
       const response = await api.post('/api/auth/login/', { email, password });
+      
+      // Axios automatically parses JSON, so we can use response.data directly.
       const { token: authToken, user: userData } = response.data;
 
       const userString = JSON.stringify(userData);
@@ -27,14 +29,31 @@ export const useAuth = () => {
         sessionStorage.setItem('user', userString);
       }
       
-      // Update the api instance with the new token
       api.defaults.headers.common['Authorization'] = `Token ${authToken}`;
       
       navigate('/admin', { replace: true });
       return { success: true };
     } catch (error) {
-      console.error("Login failed:", error);
-      const errorMessage = error.response?.data?.error || 'Invalid credentials or server error.';
+      // Robust error handling to prevent crashes from non-JSON responses.
+      let errorMessage = "An unexpected error occurred.";
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        if (typeof errorData === 'string') {
+          errorMessage = errorData;
+        } else if (errorData.error) {
+          errorMessage = errorData.error;
+        } else {
+          try {
+            errorMessage = JSON.stringify(errorData);
+          } catch (parseError) {
+            errorMessage = "Failed to parse error response.";
+          }
+        }
+      } else if (error.request) {
+        errorMessage = "No response from server. Please check your connection.";
+      }
+      
+      console.error("Login failed:", errorMessage);
       return { success: false, error: errorMessage };
     }
   };
