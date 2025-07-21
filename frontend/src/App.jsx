@@ -1,13 +1,17 @@
-import { RouterProvider } from 'react-router-dom'
-import { ThemeProvider } from './context/ThemeContext'
-import { router } from './components/router/routes'
+import { RouterProvider } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider } from './context/AuthContext'; // Import the new provider
+import { router } from './components/router/routes';
 
 function App() {
   return (
-    <ThemeProvider>
-      <RouterProvider router={router} />
-    </ThemeProvider>
-  )
+    // Wrap the entire app in AuthProvider to make auth state available everywhere
+    <AuthProvider>
+      <ThemeProvider>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </AuthProvider>
+  );
 }
 
-export default App 
+export default App; 
