@@ -53,8 +53,7 @@ const Login = () => {
       setErrors({ email: true, password: true });
       setIsLoading(false);
     } else {
-      // Do not navigate here; AdminLayout will handle redirect
-      // Optionally, keep isLoading true to show spinner until redirect
+      navigate('/admin', { replace: true });
     }
   };
 
