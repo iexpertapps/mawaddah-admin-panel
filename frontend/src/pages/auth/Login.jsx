@@ -1,94 +1,60 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Button } from '../../components/atoms/Button'
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '../../components/atoms/Button';
 import MawaddahInput from '../../components/atoms/mawaddah/MawaddahInput';
-import { Heading, Text, Label } from '../../components/atoms/typography'
-import { useTheme } from '../../context/ThemeContext'
-import { Eye, EyeOff } from 'lucide-react';
-
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'https://mawaddahapp.up.railway.app';
+import { Heading, Text } from '../../components/atoms/typography';
+import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../hooks/useAuth'; // Import the unified auth hook
 
 const Login = () => {
-  const { theme, isDark } = useTheme()
-  const navigate = useNavigate()
+  const { theme, isDark } = useTheme();
+  const { login } = useAuth(); // Use the login function from the hook
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    rememberMe: false
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState({})
-  const [formError, setFormError] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-
-  // Custom floating animation
-  // Add this to index.css if not present:
-  // @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-  // .animate-float { animation: float 4s ease-in-out infinite; }
+    rememberMe: false,
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [formError, setFormError] = useState('');
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
-    }))
-    setErrors(prev => ({ ...prev, [field]: undefined }))
-    setFormError('')
-  }
+      [field]: value,
+    }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+    setFormError('');
+  };
 
   const validate = () => {
-    const newErrors = {}
-    if (!formData.email) newErrors.email = 'Email is required.'
-    if (!formData.password) newErrors.password = 'Password is required.'
-    return newErrors
-  }
+    const newErrors = {};
+    if (!formData.email) newErrors.email = 'Email is required.';
+    if (!formData.password) newErrors.password = 'Password is required.';
+    return newErrors;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const validationErrors = validate()
+    e.preventDefault();
+    const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
-      return
+      setErrors(validationErrors);
+      return;
     }
-    setIsLoading(true)
-    setFormError('')
+    setIsLoading(true);
+    setFormError('');
+
+    // Call the login function from our unified useAuth hook
+    const result = await login(formData.email, formData.password, formData.rememberMe);
+
+    if (!result.success) {
+      setFormError(result.error);
+      setErrors({ email: true, password: true });
+    }
     
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        }),
-        credentials: 'include' // Ensure session cookie is set
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        if (formData.rememberMe) {
-          localStorage.setItem('authToken', data.token)
-          localStorage.setItem('user', JSON.stringify(data.user))
-          sessionStorage.removeItem('authToken')
-          sessionStorage.removeItem('user')
-        } else {
-          sessionStorage.setItem('authToken', data.token)
-          sessionStorage.setItem('user', JSON.stringify(data.user))
-          localStorage.removeItem('authToken')
-          localStorage.removeItem('user')
-        }
-        navigate('/admin', { replace: true })
-      } else {
-        const errorData = await response.json()
-        setFormError(errorData.error || 'Invalid email or password')
-        setErrors({ email: true, password: true })
-      }
-    } catch (err) {
-      setFormError('Connection error. Please check your internet connection.')
-      setErrors({ email: true, password: true })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    // The useAuth hook handles navigation on success, so no need to do it here.
+    setIsLoading(false);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
@@ -222,7 +188,7 @@ const Login = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login 
+export default Login; 
