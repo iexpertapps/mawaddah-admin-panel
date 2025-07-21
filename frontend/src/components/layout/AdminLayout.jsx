@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../../context/ThemeContext'
 import { useAuth } from '../../hooks/useAuth'
@@ -86,6 +86,27 @@ const Topbar = ({ pageTitle }) => {
 }
 
 const AdminLayout = ({ pageTitle = 'Admin', children }) => {
+  const { isAuthenticated, token } = useAuth();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check authentication on mount
+    if (!isAuthenticated || !token) {
+      navigate('/login');
+      return;
+    }
+    setIsLoading(false);
+  }, [isAuthenticated, token, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-green-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-green-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-slate-800 dark:text-white">
       {/* Sidebar */}

@@ -10,6 +10,7 @@ import Profile from "../../pages/admin/Profile";
 import NotFound from "../../pages/NotFound";
 import ErrorBoundary from "../ErrorBoundary";
 import WalletPage from '../../pages/admin/wallet';
+import ProtectedRoute from './ProtectedRoute';
 
 export const router = createBrowserRouter([
   {
@@ -18,7 +19,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
     errorElement: <ErrorBoundary />,
     children: [
       {
