@@ -13,6 +13,7 @@ import WalletPage from '../../pages/admin/wallet';
 import ProtectedRoute from './ProtectedRoute';
 import React, { useContext } from 'react';
 import AuthContext from '../../context/AuthContext';
+import AuthProvider from '../../context/AuthProvider';
 
 // A component to handle root redirection
 const RootRedirect = () => {
@@ -25,18 +26,24 @@ const RootRedirect = () => {
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <RootRedirect />,
+    element: (
+      <AuthProvider>
+        <RootRedirect />
+      </AuthProvider>
+    ),
   },
   {
     path: "/login",
-    element: <Login />,
+    element: <Login />, // Login does not need AuthProvider
   },
   {
     path: "/admin",
     element: (
-      <ProtectedRoute allowedRoles={['admin']}>
-        <AdminLayout />
-      </ProtectedRoute>
+      <AuthProvider>
+        <ProtectedRoute allowedRoles={['admin']}>
+          <AdminLayout />
+        </ProtectedRoute>
+      </AuthProvider>
     ),
     errorElement: <ErrorBoundary />,
     children: [
@@ -72,7 +79,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <NotFound />,
+    element: <NotFound />, // NotFound does not need AuthProvider
     errorElement: <ErrorBoundary />,
   },
 ]); 
