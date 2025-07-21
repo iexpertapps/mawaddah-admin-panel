@@ -11,7 +11,18 @@ export const useAuth = () => {
     ? localStorage.getItem('authToken') || sessionStorage.getItem('authToken')
     : null;
 
-  const user = token ? JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || 'null') : null;
+  // Robust user parsing: only parse if a string exists, fallback to null on error
+  let user = null;
+  if (token) {
+    const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (userStr) {
+      try {
+        user = JSON.parse(userStr);
+      } catch (e) {
+        user = null;
+      }
+    }
+  }
 
   const login = async (email, password, rememberMe) => {
     try {
