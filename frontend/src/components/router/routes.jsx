@@ -12,7 +12,7 @@ import ErrorBoundary from "../ErrorBoundary";
 import WalletPage from '../../pages/admin/wallet';
 import ProtectedRoute from './ProtectedRoute';
 import React, { useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
+import AuthContext from '../../context/AuthContext';
 
 // A component to handle root redirection
 const RootRedirect = () => {
