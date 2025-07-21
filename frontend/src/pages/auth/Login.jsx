@@ -51,10 +51,11 @@ const Login = () => {
     if (!result.success) {
       setFormError(result.error);
       setErrors({ email: true, password: true });
+      setIsLoading(false);
     } else {
-      navigate('/admin', { replace: true });
+      // Do not navigate here; AdminLayout will handle redirect
+      // Optionally, keep isLoading true to show spinner until redirect
     }
-    setIsLoading(false);
   };
 
   return (
