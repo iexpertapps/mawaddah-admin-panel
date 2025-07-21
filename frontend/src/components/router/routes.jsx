@@ -11,22 +11,14 @@ import NotFound from "../../pages/NotFound";
 import ErrorBoundary from "../ErrorBoundary";
 import WalletPage from '../../pages/admin/wallet';
 import ProtectedRoute from './ProtectedRoute';
-import React from 'react';
+import React, { useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
 
 // A component to handle root redirection
 const RootRedirect = () => {
-  // Use a fallback state to avoid SSR mismatch
-  const [checked, setChecked] = React.useState(false);
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-  React.useEffect(() => {
-    // Dynamically import useAuth to ensure context is available
-    import('../../context/AuthContext').then(({ useAuth }) => {
-      const { isAuthenticated } = useAuth();
-      setIsAuthenticated(isAuthenticated);
-      setChecked(true);
-    });
-  }, []);
-  if (!checked) return null;
+  const context = useContext(AuthContext);
+  if (!context) return null; // or a loading spinner
+  const { isAuthenticated } = context;
   return <Navigate to={isAuthenticated ? "/admin" : "/login"} replace />;
 };
 
