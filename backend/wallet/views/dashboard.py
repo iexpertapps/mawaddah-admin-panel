@@ -85,9 +85,9 @@ class DashboardStatsView(APIView):
             for appeal in recent_appeals:
                 activities.append({
                     'type': 'appeal',
-                    'message': f'Appeal "{getattr(appeal, 'title', 'Unknown')}" was {getattr(appeal, 'status', 'Unknown')}',
+                    'message': f"Appeal '{getattr(appeal, 'title', 'Unknown')}' was {getattr(appeal, 'status', 'Unknown')}",
                     'time': getattr(appeal, 'created_at', None),
-                    'amount': f'-${getattr(appeal, 'amount_requested', '')}' if getattr(appeal, 'amount_requested', None) else ''
+                    'amount': f"-${getattr(appeal, 'amount_requested', '')}" if getattr(appeal, 'amount_requested', None) else ''
                 })
 
             for user in recent_users:
