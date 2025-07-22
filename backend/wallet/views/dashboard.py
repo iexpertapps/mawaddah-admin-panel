@@ -21,103 +21,110 @@ class DashboardStatsView(APIView):
     def get(self, request):
         if not request.user.is_authenticated:
             return Response({"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            now = timezone.now()
+            period = request.GET.get('period', '30')
+            # Calculate date range based on period
+            if period == '7':
+                start_date = now - timedelta(days=7)
+            elif period == '30':
+                start_date = now - timedelta(days=30)
+            elif period == '90':
+                start_date = now - timedelta(days=90)
+            else:
+                start_date = now - timedelta(days=30)
 
-        now = timezone.now()
-        period = request.GET.get('period', '30')
-        
-        # Calculate date range based on period
-        if period == '7':
-            start_date = now - timedelta(days=7)
-        elif period == '30':
-            start_date = now - timedelta(days=30)
-        elif period == '90':
-            start_date = now - timedelta(days=90)
-        else:
-            start_date = now - timedelta(days=30)
+            # Total donations
+            total_donations = Donation.objects.filter(
+                created_at__gte=start_date
+            ).aggregate(total=Sum('amount'))['total'] or 0
 
-        # Total donations
-        total_donations = Donation.objects.filter(
-            created_at__gte=start_date
-        ).aggregate(total=Sum('amount'))['total'] or 0
+            # Active appeals
+            active_appeals = Appeal.objects.filter(status='active').count()
 
-        # Active appeals
-        active_appeals = Appeal.objects.filter(status='active').count()
+            # Registered users
+            total_users = User.objects.count()
 
-        # Registered users
-        total_users = User.objects.count()
+            # Wallet balance (sum of all user wallets)
+            total_wallet_balance = User.objects.aggregate(
+                total=Sum('wallet_balance')
+            )['total'] or 0
 
-        # Wallet balance (sum of all user wallets)
-        total_wallet_balance = User.objects.aggregate(
-            total=Sum('wallet_balance')
-        )['total'] or 0
+            # Recent activity
+            recent_donations = Donation.objects.filter(
+                created_at__gte=start_date
+            ).order_by('-created_at')[:5]
 
-        # Recent activity
-        recent_donations = Donation.objects.filter(
-            created_at__gte=start_date
-        ).order_by('-created_at')[:5]
+            recent_appeals = Appeal.objects.filter(
+                created_at__gte=start_date
+            ).order_by('-created_at')[:5]
 
-        recent_appeals = Appeal.objects.filter(
-            created_at__gte=start_date
-        ).order_by('-created_at')[:5]
+            recent_users = User.objects.filter(
+                date_joined__gte=start_date
+            ).order_by('-date_joined')[:5]
 
-        recent_users = User.objects.filter(
-            date_joined__gte=start_date
-        ).order_by('-date_joined')[:5]
+            recent_withdrawals = WalletTransaction.objects.filter(
+                type='debit',
+                created_at__gte=start_date
+            ).order_by('-timestamp')[:5]
 
-        recent_withdrawals = WalletTransaction.objects.filter(
-            type='debit',
-            created_at__gte=start_date
-        ).order_by('-timestamp')[:5]
+            # Format activity data
+            activities = []
+            for donation in recent_donations:
+                try:
+                    donor_name = donation.donor.full_name if donation.donor else "Anonymous"
+                except Exception as e:
+                    donor_name = f"Error: {e}"
+                activities.append({
+                    'type': 'donation',
+                    'message': f'New donation of ${donation.amount} received from {donor_name}',
+                    'time': donation.created_at,
+                    'amount': f'+${donation.amount}'
+                })
 
-        # Format activity data
-        activities = []
-        
-        for donation in recent_donations:
-            activities.append({
-                'type': 'donation',
-                'message': f'New donation of ${donation.amount} received from {donation.donor.full_name if donation.donor else "Anonymous"}',
-                'time': donation.created_at,
-                'amount': f'+${donation.amount}'
+            for appeal in recent_appeals:
+                activities.append({
+                    'type': 'appeal',
+                    'message': f'Appeal "{getattr(appeal, 'title', 'Unknown')}" was {getattr(appeal, 'status', 'Unknown')}',
+                    'time': getattr(appeal, 'created_at', None),
+                    'amount': f'-${getattr(appeal, 'amount_requested', '')}' if getattr(appeal, 'amount_requested', None) else ''
+                })
+
+            for user in recent_users:
+                activities.append({
+                    'type': 'user',
+                    'message': f'New user {getattr(user, 'full_name', user.email)} registered',
+                    'time': getattr(user, 'date_joined', None),
+                    'amount': ''
+                })
+
+            for withdrawal in recent_withdrawals:
+                activities.append({
+                    'type': 'withdrawal',
+                    'message': f'Withdrawal processed for ${getattr(withdrawal, 'amount', 'Unknown')}',
+                    'time': getattr(withdrawal, 'created_at', None),
+                    'amount': f'-${getattr(withdrawal, 'amount', '')}'
+                })
+
+            # Sort activities by time (most recent first)
+            activities = [a for a in activities if a.get('time')]
+            activities.sort(key=lambda x: x['time'], reverse=True)
+            activities = activities[:10]  # Limit to 10 most recent
+
+            return Response({
+                'stats': {
+                    'total_donations': total_donations,
+                    'active_appeals': active_appeals,
+                    'registered_users': total_users,
+                    'wallet_balance': total_wallet_balance
+                },
+                'activities': activities,
+                'period': period
             })
-
-        for appeal in recent_appeals:
-            activities.append({
-                'type': 'appeal',
-                'message': f'Appeal "{appeal.title}" was {appeal.status}',
-                'time': appeal.created_at,
-                'amount': f'-${appeal.amount_requested}' if appeal.amount_requested else ''
-            })
-
-        for user in recent_users:
-            activities.append({
-                'type': 'user',
-                'message': f'New user {user.full_name} registered',
-                'time': user.date_joined,
-                'amount': ''
-            })
-
-        for withdrawal in recent_withdrawals:
-            activities.append({
-                'type': 'withdrawal',
-                'message': f'Withdrawal processed for ${withdrawal.amount}',
-                'time': withdrawal.created_at,
-                'amount': f'-${withdrawal.amount}'
-            })
-
-        # Sort activities by time (most recent first)
-        activities.sort(key=lambda x: x['time'], reverse=True)
-        activities = activities[:10]  # Limit to 10 most recent
-
-        return Response({
-            'stats': {
-                'total_donations': total_donations,
-                'active_appeals': active_appeals,
-                'registered_users': total_users,
-                'wallet_balance': total_wallet_balance
-            },
-            'activities': activities,
-            'period': period
-        })
+        except Exception as e:
+            import logging, traceback
+            logging.exception("Error in DashboardStatsView.get")
+            return Response({"detail": f"Internal server error: {str(e)}", "trace": traceback.format_exc()}, status=500)
 
 class ShuraSummaryView(APIView):
     permission_classes = [AllowAny]
