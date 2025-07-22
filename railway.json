@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python backend/manage.py migrate && gunicorn backend.wsgi",
+    "startCommand": "python backend/manage.py migrate && gunicorn backend.mawaddah_backend.wsgi",
     "healthcheckPath": "/api/health",
     "healthcheckTimeout": 150,
     "restartPolicyType": "ON_FAILURE",
