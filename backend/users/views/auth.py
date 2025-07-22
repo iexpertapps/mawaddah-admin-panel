@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
 from users.serializers import UserSerializer
+from rest_framework.authtoken.models import Token
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -27,7 +28,11 @@ def login_view(request):
     user = authenticate(request, username=email, password=password)
     if user:
         login(request, user)
-        return Response(UserSerializer(user).data)
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user': UserSerializer(user).data
+        })
     return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
