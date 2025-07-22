@@ -80,6 +80,7 @@ const AuthProvider = ({ children }) => {
     loading,
     login,
     logout,
+    role: user?.role || '', // Add this line
   };
 
   return (
