@@ -2,7 +2,7 @@ import logging
 from datetime import timedelta
 
 from django.utils import timezone
-from django.db.models import Sum, Avg
+from django.db.models import Sum
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, BasePermission
@@ -11,8 +11,7 @@ from rest_framework.response import Response
 from users.models import User
 from donations.models import Donation
 from appeals.models import Appeal
-from wallet.models import WalletTransaction
-
+from wallet.models import Wallet, WalletTransaction
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +35,7 @@ class IsAdminOnly(BasePermission):
 def get_recent_activities(start_date):
     """
     Return consolidated recent activities: donations, appeals, users, and withdrawals.
+    Safely handles missing/null fields.
     """
     activities = []
 
@@ -48,7 +48,7 @@ def get_recent_activities(start_date):
             "title": "New donation received",
             "message": f"${donation.amount} from {donor_name}",
             "user": donor_name,
-            "timestamp": donation.created_at.isoformat(),
+            "timestamp": donation.created_at.isoformat() if donation.created_at else None,
             "amount": float(donation.amount),
         })
 
@@ -58,11 +58,11 @@ def get_recent_activities(start_date):
         activities.append({
             "id": f"appeal_{appeal.id}",
             "type": "appeal",
-            "title": f"Appeal {appeal.status}",
+            "title": f"Appeal {getattr(appeal, 'status', 'Unknown')}",
             "message": f"\"{getattr(appeal, 'title', 'Unknown')}\" was {getattr(appeal, 'status', 'Unknown')}",
             "user": created_by_name,
-            "timestamp": appeal.created_at.isoformat(),
-            "amount": float(appeal.amount_requested) if appeal.amount_requested else None,
+            "timestamp": appeal.created_at.isoformat() if appeal.created_at else None,
+            "amount": float(appeal.amount_requested) if getattr(appeal, "amount_requested", None) else None,
         })
 
     # Users
@@ -74,24 +74,29 @@ def get_recent_activities(start_date):
             "title": "New user registered",
             "message": f"{full_name} joined the platform",
             "user": full_name,
-            "timestamp": user.date_joined.isoformat(),
+            "timestamp": user.date_joined.isoformat() if user.date_joined else None,
             "amount": None,
         })
 
     # Withdrawals
     for withdrawal in WalletTransaction.objects.filter(type="debit", created_at__gte=start_date).order_by("-created_at")[:5]:
-        user_full_name = getattr(withdrawal.wallet.user, "full_name", "Unknown") if withdrawal.wallet else "Unknown"
+        user_full_name = (
+            getattr(withdrawal.wallet.user, "full_name", "Unknown")
+            if withdrawal.wallet and withdrawal.wallet.user
+            else "Unknown"
+        )
         activities.append({
             "id": f"withdrawal_{withdrawal.id}",
             "type": "withdrawal",
             "title": "Withdrawal processed",
             "message": f"${withdrawal.amount} withdrawal processed",
             "user": user_full_name,
-            "timestamp": withdrawal.created_at.isoformat(),
+            "timestamp": withdrawal.created_at.isoformat() if withdrawal.created_at else None,
             "amount": float(withdrawal.amount),
         })
 
-    # Sort and limit
+    # Filter out any missing timestamps and sort by newest
+    activities = [a for a in activities if a.get("timestamp")]
     activities = sorted(activities, key=lambda x: x["timestamp"], reverse=True)[:10]
     return activities
 
@@ -121,8 +126,9 @@ class DashboardStatsView(APIView):
             active_appeals = Appeal.objects.filter(status="active").count()
             total_users = User.objects.count()
 
-            total_wallet_balance = User.objects.aggregate(
-                total=Sum("wallet_balance")
+            # FIX: use Wallet model for total balance instead of User.wallet_balance
+            total_wallet_balance = Wallet.objects.aggregate(
+                total=Sum("balance")
             )["total"] or 0
 
             activities = get_recent_activities(start_date)
@@ -137,9 +143,14 @@ class DashboardStatsView(APIView):
                 "activities": activities,
                 "period": period,
             })
+
         except Exception as e:
+            import traceback
             logger.exception("Error in DashboardStatsView.get")
-            return Response({"detail": f"Internal server error: {str(e)}"}, status=500)
+            return Response({
+                "detail": str(e),
+                "trace": traceback.format_exc()
+            }, status=500)
 
 
 class ShuraSummaryView(APIView):
@@ -150,22 +161,25 @@ class ShuraSummaryView(APIView):
         Return summary for Shura: withdrawals and processing time.
         """
         now = timezone.now()
+        try:
+            total_withdrawals = WalletTransaction.objects.filter(type="debit").count()
 
-        total_withdrawals = WalletTransaction.objects.filter(type="debit").count()
+            recent_withdrawals = WalletTransaction.objects.filter(type="debit", created_at__isnull=False)
+            avg_processing_time_hours = 24 if recent_withdrawals.exists() else None  # Placeholder
 
-        recent_withdrawals = WalletTransaction.objects.filter(type="debit", created_at__isnull=False)
-        avg_processing_time_hours = 24 if recent_withdrawals.exists() else None  # Placeholder
+            start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            total_withdrawals_this_month = WalletTransaction.objects.filter(
+                type="debit", created_at__gte=start_of_month
+            ).count()
 
-        start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        total_withdrawals_this_month = WalletTransaction.objects.filter(
-            type="debit", created_at__gte=start_of_month
-        ).count()
-
-        return Response({
-            "total_withdrawals": total_withdrawals,
-            "avg_processing_time_hours": avg_processing_time_hours,
-            "total_withdrawals_this_month": total_withdrawals_this_month,
-        })
+            return Response({
+                "total_withdrawals": total_withdrawals,
+                "avg_processing_time_hours": avg_processing_time_hours,
+                "total_withdrawals_this_month": total_withdrawals_this_month,
+            })
+        except Exception as e:
+            logger.exception("Error in ShuraSummaryView.get")
+            return Response({"detail": str(e)}, status=500)
 
 
 class RecentActivityView(APIView):
@@ -180,8 +194,8 @@ class RecentActivityView(APIView):
             activities = get_recent_activities(start_date)
             return Response({"activities": activities})
         except Exception as e:
-            logger.error(f"Error in RecentActivityView: {e}")
-            return Response({"activities": []}, status=200)
+            logger.exception("Error in RecentActivityView.get")
+            return Response({"activities": [], "detail": str(e)}, status=500)
 
 
 class WalletStatsView(APIView):
@@ -192,32 +206,36 @@ class WalletStatsView(APIView):
         Return wallet stats for the current user.
         """
         user = request.user
-        wallet = getattr(user, "wallet", None)
-        if not wallet:
-            return Response({"error": "Wallet not found"}, status=404)
+        try:
+            wallet = getattr(user, "wallet", None)
+            if not wallet:
+                return Response({"error": "Wallet not found"}, status=404)
 
-        recent_transactions = WalletTransaction.objects.filter(wallet=wallet).order_by("-created_at")[:10]
+            recent_transactions = WalletTransaction.objects.filter(wallet=wallet).order_by("-created_at")[:10]
 
-        total_credited = WalletTransaction.objects.filter(wallet=wallet, type="credit").aggregate(
-            total=Sum("amount")
-        )["total"] or 0
+            total_credited = WalletTransaction.objects.filter(wallet=wallet, type="credit").aggregate(
+                total=Sum("amount")
+            )["total"] or 0
 
-        total_withdrawn = WalletTransaction.objects.filter(wallet=wallet, type="debit").aggregate(
-            total=Sum("amount")
-        )["total"] or 0
+            total_withdrawn = WalletTransaction.objects.filter(wallet=wallet, type="debit").aggregate(
+                total=Sum("amount")
+            )["total"] or 0
 
-        return Response({
-            "wallet_balance": float(wallet.balance),
-            "total_credited": float(total_credited),
-            "total_withdrawn": float(total_withdrawn),
-            "recent_transactions": [
-                {
-                    "id": transaction.id,
-                    "type": transaction.type,
-                    "amount": float(transaction.amount),
-                    "description": transaction.description,
-                    "created_at": transaction.created_at.isoformat(),
-                }
-                for transaction in recent_transactions
-            ]
-        })
+            return Response({
+                "wallet_balance": float(wallet.balance),
+                "total_credited": float(total_credited),
+                "total_withdrawn": float(total_withdrawn),
+                "recent_transactions": [
+                    {
+                        "id": transaction.id,
+                        "type": transaction.type,
+                        "amount": float(transaction.amount),
+                        "description": transaction.description,
+                        "created_at": transaction.created_at.isoformat() if transaction.created_at else None,
+                    }
+                    for transaction in recent_transactions
+                ]
+            })
+        except Exception as e:
+            logger.exception("Error in WalletStatsView.get")
+            return Response({"detail": str(e)}, status=500)
