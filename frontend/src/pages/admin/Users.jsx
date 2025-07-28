@@ -54,47 +54,59 @@ const useUsers = (filters = {}, activeFilter = 'all', page = 1, pageSize = 10) =
 
   useEffect(() => {
     if (!token) return;
+
     setLoading(true);
     setError(null);
-    // Build query params from filters
+
+    // Build query params
     const params = new URLSearchParams();
     params.append('page', page);
     params.append('page_size', pageSize);
-    // Role filter
+
+    // Role filtering
     if (activeFilter === 'donors') params.append('role', 'donor');
     else if (activeFilter === 'recipients') params.append('role', 'recipient');
     else if (activeFilter === 'shura') params.append('role', 'shura');
     else if (filters.role && filters.role !== 'all') params.append('role', filters.role);
+
     // Search filter
     if (filters.search) params.append('search', filters.search);
-    // Verified Syed filter
-    if (filters.verifiedSyed !== undefined) params.append('is_verified_syed', filters.verifiedSyed);
-    let url = `/api/users/?${params.toString()}`;
-    fetch(url, {
-      headers: { 'Authorization': `Token ${token}` }
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch users');
-        return res.json();
-      })
-      .then(usersData => {
-        const users = Array.isArray(usersData.results) ? usersData.results : usersData;
-        setAllUsers(users);
-        setTotalCount(usersData.count || users.length);
-      })
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [token, activeFilter, page, pageSize, filters.search, filters.role, filters.verifiedSyed]);
 
-  // No more client-side filtering for search, role, or verifiedSyed
+    // Verified Syed filter
+    if (filters.verifiedSyed !== undefined)
+      params.append('is_verified_syed', filters.verifiedSyed);
+
+    // API call using axios instance
+    api
+      .get(`/api/users/`, { params }) // Axios handles params serialization
+      .then((res) => {
+        const data = res.data;
+        const users = Array.isArray(data.results) ? data.results : data;
+        setAllUsers(users);
+        setTotalCount(data.count || users.length);
+      })
+      .catch((err) => {
+        setError(err.response?.data?.detail || err.message);
+      })
+      .finally(() => setLoading(false));
+  }, [
+    token,
+    activeFilter,
+    page,
+    pageSize,
+    filters.search,
+    filters.role,
+    filters.verifiedSyed,
+  ]);
   return {
     users: allUsers,
     loading,
     error,
     totalCount,
-    filteredCount: allUsers.length
+    filteredCount: allUsers.length,
   };
 };
+
 
 // Enhanced useUserStats hook with filtered counts
 const useUserStats = () => {
@@ -302,56 +314,52 @@ const EnhancedStatCard = ({ icon, title, value, loading, error, highlight, onCli
   )
 }
 
-// Add User Modal Component
 const AddUserModal = ({ isOpen, onClose, onSuccess }) => {
-  const { token } = useAuth()
+  const { token } = useAuth();
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
     email: '',
     phone: '',
     role: 'shura'
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     try {
-      const response = await fetch('/api/users/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          ...formData,
-          password: 'temp_password_123', // Will be reset on first login
-          password_confirm: 'temp_password_123',
-          // force_password_reset: true // Remove if not used in backend
-        })
-      })
+      const { data: newUser } = await api.post('/api/users/', {
+        ...formData,
+        password: 'temp_password_123', // Temporary password
+        password_confirm: 'temp_password_123',
+      });
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Failed to create Shura Member')
-      }
-
-      const newUser = await response.json()
-      onSuccess(newUser)
-      onClose()
-      setFormData({ first_name: '', last_name: '', email: '', phone: '', role: 'shura' })
+      onSuccess(newUser);
+      onClose();
+      setFormData({
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        role: 'shura',
+      });
     } catch (err) {
-      setError('Failed to create Shura Member')
+      // Try to extract better error message
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.detail ||
+        'Failed to create user';
+      setError(message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -367,55 +375,79 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* First & Last Name */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Text size="sm" className="mb-1">First Name *</Text>
+              <Text size="sm" className="mb-1">
+                First Name *
+              </Text>
               <input
                 type="text"
                 required
                 value={formData.first_name}
-                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, first_name: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
               />
             </div>
             <div>
-              <Text size="sm" className="mb-1">Last Name *</Text>
+              <Text size="sm" className="mb-1">
+                Last Name *
+              </Text>
               <input
                 type="text"
                 required
                 value={formData.last_name}
-                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, last_name: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
               />
             </div>
           </div>
 
+          {/* Email */}
           <div>
-            <Text size="sm" className="mb-1">Email *</Text>
+            <Text size="sm" className="mb-1">
+              Email *
+            </Text>
             <input
               type="email"
               required
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
             />
           </div>
 
+          {/* Phone */}
           <div>
-            <Text size="sm" className="mb-1">Phone</Text>
+            <Text size="sm" className="mb-1">
+              Phone
+            </Text>
             <input
               type="tel"
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
             />
           </div>
 
+          {/* Role */}
           <div>
-            <Text size="sm" className="mb-1">Role</Text>
+            <Text size="sm" className="mb-1">
+              Role
+            </Text>
             <select
               value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, role: e.target.value })
+              }
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               <option value="shura">Shura Member</option>
@@ -426,12 +458,16 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }) => {
             </select>
           </div>
 
+          {/* Error Message */}
           {error && (
             <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <Text size="sm" className="text-red-600 dark:text-red-400">{error}</Text>
+              <Text size="sm" className="text-red-600 dark:text-red-400">
+                {error}
+              </Text>
             </div>
           )}
 
+          {/* Buttons */}
           <div className="flex gap-3 pt-4">
             <Button
               type="button"
@@ -454,8 +490,8 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }) => {
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // Users Table Component
 const UsersTable = ({ users, loading, error, onView, onEdit, onResetPassword, totalCount, filteredCount }) => {
@@ -660,52 +696,49 @@ function ChangePasswordForm({ user, onSuccess }) {
   // Reset state on modal close
   // (Assume parent will unmount this component on close, so useEffect not strictly needed)
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
-    if (password !== confirm) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
-    try {
-      const res = await fetch(`/api/users/${user.id}/set_password/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ password }),
-      });
-      if (!res.ok) {
-        let extractedError = 'Failed to change password';
-        try {
-          const data = await res.json();
-          if (Array.isArray(data?.password)) {
-            extractedError = data.password.join(' ');
-          } else if (typeof data?.password === 'string') {
-            extractedError = data.password;
-          } else if (data?.error) {
-            extractedError = data.error;
-          } else if (data?.detail) {
-            extractedError = data.detail;
-          }
-        } catch {}
-        setError(humanizeError(extractedError));
-        setLoading(false);
-        return;
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError(null);
+  setSuccess(false);
+
+  if (password !== confirm) {
+    setError('Passwords do not match');
+    setLoading(false);
+    return;
+  }
+
+  try {
+    await api.post(`/api/users/${user.id}/set_password/`, { password });
+
+    // If successful
+    setSuccess(true);
+    resetState();
+    setTimeout(() => onSuccess(), 1200);
+  } catch (err) {
+    // Extract server error message if available
+    let extractedError = 'Failed to change password';
+    const data = err.response?.data;
+
+    if (data) {
+      if (Array.isArray(data.password)) {
+        extractedError = data.password.join(' ');
+      } else if (typeof data.password === 'string') {
+        extractedError = data.password;
+      } else if (data.error) {
+        extractedError = data.error;
+      } else if (data.detail) {
+        extractedError = data.detail;
       }
-      setSuccess(true);
-      resetState();
-      setTimeout(() => onSuccess(), 1200);
-    } catch (err) {
-      setError('Failed to change password');
-    } finally {
-      setLoading(false);
     }
-  };
+
+    setError(humanizeError(extractedError));
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" ref={formRef}>
