@@ -1,19 +1,3 @@
-"""
-URL configuration for mawaddah_backend project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -31,13 +15,12 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import permission_classes
 
 router = DefaultRouter()
-# These viewsets will now require authentication by default
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'appeals', AppealViewSet, basename='appeal')
 router.register(r'donations', DonationViewSet, basename='donation')
 
+
 def debug_env(request):
-    """Debug endpoint to check environment variables"""
     env_vars = {
         'RAILWAY_ENVIRONMENT': os.environ.get('RAILWAY_ENVIRONMENT', 'NOT_SET'),
         'RAILWAY_PROJECT_ID': os.environ.get('RAILWAY_PROJECT_ID', 'NOT_SET'),
@@ -48,32 +31,51 @@ def debug_env(request):
     }
     return JsonResponse(env_vars)
 
+
 @permission_classes([AllowAny])
 def health_check(request):
-    """Simple health check endpoint for Railway"""
     return JsonResponse({'status': 'healthy', 'message': 'Django app is running'})
+
 
 @permission_classes([AllowAny])
 def root_view(request):
     return JsonResponse({"status": "Mawaddah API is Live", "version": "1.0"})
 
+
 urlpatterns = [
+    # Health checks
     path('api/health', health_check, name='api_health_no_slash'),
     path('api/health/', health_check, name='api_health_slash'),
-    path('', health_check, name='root-health-check'),  # Root path for Railway healthcheck
+    path('', health_check, name='root-health-check'),
+
+    # Django admin
     path('admin/', admin.site.urls),
+
+    # Admin profile endpoint
     path('api/admin/profile/', AdminProfileView.as_view(), name='admin-profile'),
+
+    # DRF routers
     path('api/', include(router.urls)),
+
+    # App URLs
     path('api/', include('users.urls')),
     path('api/', include('appeals.urls')),
     path('api/', include('donations.urls')),
-    path('api/', include('wallet.urls')),
+    path('api/wallet/', include('wallet.urls', namespace='wallet')),
+
+    # Dashboard & analytics
     path('api/wallet/stats/', WalletStatsView.as_view(), name='wallet-stats'),
     path('api/dashboard/stats/', DashboardStatsView.as_view(), name='dashboard-stats'),
     path('api/dashboard/recent-activity/', RecentActivityView.as_view(), name='recent-activity'),
+
+    # API docs
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+
+    # Settings app
     path('api/settings/', include('settings.urls')),
+
+    # Debugging
     path('api/debug/env/', debug_env, name='debug_env'),
 ]
 
