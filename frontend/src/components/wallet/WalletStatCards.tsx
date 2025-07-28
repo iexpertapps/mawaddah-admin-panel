@@ -43,7 +43,7 @@ export default function WalletStatCards() {
       setLoading(true);
       try {
         // Use centralized axios instance
-        const { data: result } = await api.get('/api/wallet/admin/overview/stats/');
+        const { data: result } = await api.get('/api/wallet/stats/');
 
         setStats({
           total: result.total_transactions ?? 0,
