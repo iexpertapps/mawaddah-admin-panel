@@ -1,7 +1,7 @@
-from django.urls import path, include
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 from wallet.views.recipient_wallet import wallet_balance, wallet_transactions, withdraw_funds
-from wallet.views.admin_wallet_views import (
+from wallet.views.admin_wallet_view import (  # <- FIX import
     AdminWalletOverviewView,
     AdminRecipientWalletListView,
     AdminRecipientWithdrawalsView,
@@ -25,9 +25,7 @@ urlpatterns = [
     path('admin/recipients/<int:user_id>/withdrawals/', AdminRecipientWithdrawalsView.as_view(), name='admin-recipient-withdrawals'),
     path('admin/recipients/<int:user_id>/transfers/', AdminRecipientTransfersView.as_view(), name='admin-recipient-transfers'),
     path('admin/transactions/', AdminWalletTransactionListView.as_view(), name='admin-wallet-transactions'),
-
-    # Include other API urls if needed
-    path('', include('wallet.api.urls')),
 ]
 
 urlpatterns += router.urls
+
