@@ -3,6 +3,7 @@ import { Banknote, TrendingUp, TrendingDown, CircleDollarSign } from 'lucide-rea
 import Card from '../../components/atoms/Card';
 import Skeleton from '../../components/atoms/Skeleton';
 import { formatCurrencyShort } from '../../utils';
+import api from '../../services/api'; // centralized axios instance
 
 const statConfig = [
   {
@@ -41,16 +42,9 @@ export default function WalletStatCards() {
     const fetchStats = async () => {
       setLoading(true);
       try {
-        // Updated to use new admin analytics endpoint
-        const response = await fetch('/api/wallet/admin/overview/', {
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        if (!response.ok) throw new Error('Failed to fetch wallet stats');
-        const result = await response.json();
-        // Map backend fields to local keys if needed
+        // Use centralized axios instance
+        const { data: result } = await api.get('/api/wallet/admin/overview/');
+
         setStats({
           total: result.total_transactions ?? 0,
           credits: result.total_credits ?? 0,
@@ -87,4 +81,4 @@ export default function WalletStatCards() {
       ))}
     </div>
   );
-} 
+}
