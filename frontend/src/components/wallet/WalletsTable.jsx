@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState } from 'react';
 import AdminTable from '../molecules/AdminTable';
 import { Badge } from '../atoms/Badge';
 import { formatCurrencyShort } from '../../utils';
@@ -9,7 +9,6 @@ import Switch from '../atoms/Switch';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import Drawer from '../molecules/Drawer';
-import WalletsTable from './WalletsTable';
 import api from '@/services/api';
 import Skeleton from '../atoms/Skeleton';
 // Utility for human-readable datetime
