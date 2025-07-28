@@ -26,7 +26,7 @@ import { useNavigate } from 'react-router-dom'
 import Drawer from '../../components/molecules/Drawer'
 import Modal from '../../components/molecules/Modal'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-
+import api from '../services/api';
 // Debounce hook for search input
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value)
@@ -107,41 +107,38 @@ const useUserStats = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [dataFetched, setDataFetched] = useState(false);
-//''
+
   useEffect(() => {
-    if (!token || dataFetched) return;
+    if (!token) return;
+
     setLoading(true);
     setError(null);
+
+    const fetchUsers = (role = '') =>
+      api.get(`/api/users/${role ? `?role=${role}` : ''}`).then((res) => res.data);
+
     Promise.all([
-      fetch('../services/api/users/', {
-        headers: { 'Authorization': `Token ${token}` }
-      }).then(res => res.ok ? res.json() : { count: 0 }),
-      fetch('../services/api/users/?role=donor', {
-        headers: { 'Authorization': `Token ${token}` }
-      }).then(res => res.ok ? res.json() : { count: 0 }),
-      fetch('../services/api/users/?role=recipient', {
-        headers: { 'Authorization': `Token ${token}` }
-      }).then(res => res.ok ? res.json() : { count: 0 }),
-      fetch('../services/api/users/?role=shura', {
-        headers: { 'Authorization': `Token ${token}` }
-      }).then(res => res.ok ? res.json() : { count: 0 })
+      fetchUsers(),
+      fetchUsers('donor'),
+      fetchUsers('recipient'),
+      fetchUsers('shura')
     ])
       .then(([usersData, donorsData, recipientsData, shuraData]) => {
         setStats({
-          allUsers: usersData.count || (Array.isArray(usersData.results) ? usersData.results.length : 0),
-          donors: donorsData.count || (Array.isArray(donorsData.results) ? donorsData.results.length : 0),
-          recipients: recipientsData.count || (Array.isArray(recipientsData.results) ? recipientsData.results.length : 0),
-          shuraMembers: shuraData.count || (Array.isArray(shuraData.results) ? shuraData.results.length : 0)
+          allUsers: usersData.count ?? usersData.results?.length ?? 0,
+          donors: donorsData.count ?? donorsData.results?.length ?? 0,
+          recipients: recipientsData.count ?? recipientsData.results?.length ?? 0,
+          shuraMembers: shuraData.count ?? shuraData.results?.length ?? 0
         });
-        setDataFetched(true);
       })
-      .catch(err => setError(err.message))
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [token, dataFetched]);
+  }, [token]);
 
   return { stats, loading, error };
 };
+
+
 
 // Enhanced Filter Bar with Clear Filter button
 const UserFilterBar = ({ filters, onFiltersChange, onAddUser, activeFilter, onClearFilter }) => {
