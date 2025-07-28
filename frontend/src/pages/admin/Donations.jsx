@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   CurrencyDollarIcon,
   BanknotesIcon,
@@ -74,7 +74,7 @@ const useDebounce = (value, delay) => {
 /* ----------------------- useDonations Hook ----------------------- */
 const useDonations = (filters = {}, page = 1, pageSize = 10) => {
   const { token } = useAuth();
-  const [data, setData] = useState({ results: [], count: 0 });
+  const [data, setData] = useState({ results: [], count: 0, meta: {} });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -105,53 +105,10 @@ const useDonations = (filters = {}, page = 1, pageSize = 10) => {
   return {
     donations: data.results || [],
     totalCount: data.count || 0,
-    filteredCount: data.count || 0,
+    meta: data.meta || {},
     loading,
     error,
   };
-}
-
-/* ----------------------- useDonationStats Hook ----------------------- */
-const useDonationStats = (filters = {}, activeFilter = 'all') => {
-  const { token } = useAuth();
-  const [stats, setStats] = useState({ totalAmount: 0, viaBank: 0, viaJazzCash: 0, viaEasypaisa: 0 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!token) return;
-
-    setLoading(true);
-    setError(null);
-
-    const params = {
-      ...(activeFilter === 'bank' && { payment_method: 'bank_transfer' }),
-      ...(activeFilter === 'jazzcash' && { payment_method: 'jazzcash' }),
-      ...(activeFilter === 'easypaisa' && { payment_method: 'easypaisa' }),
-      ...(filters.paymentMethod && filters.paymentMethod !== 'all' && { payment_method: filters.paymentMethod }),
-      ...(filters.search && { search: filters.search }),
-      ...(filters.appealLinked === true && { appeal_linked: 'true' }),
-      ...(filters.appealLinked === false && { appeal_linked: 'false' }),
-    };
-
-    api.get('/api/donations/stats/', { params })
-      .then((res) => {
-        const meta = res.data.meta || {};
-        setStats({
-          totalAmount: Number(meta.total_amount) || 0,
-          viaBank: Number(meta.via_bank) || 0,
-          viaJazzCash: Number(meta.via_jazzcash) || 0,
-          viaEasypaisa: Number(meta.via_easypaisa) || 0,
-        });
-      })
-      .catch((err) => {
-        console.error('[useDonationStats] Fetch error', err);
-        setError(err);
-      })
-      .finally(() => setLoading(false));
-  }, [token, activeFilter, JSON.stringify(filters)]);
-
-  return { stats, loading, error };
 }
 
 /* ----------------------- Filter Bar ----------------------- */
@@ -280,20 +237,19 @@ const Donations = () => {
   const [pageSize, setPageSize] = useState(10)
   const [selectedDonation, setSelectedDonation] = useState(null)
 
-  const { donations, loading, error, totalCount } = useDonations(filters, currentPage, pageSize)
-  const { stats, loading: statsLoading, error: statsError } = useDonationStats()
+  const { donations, loading, error, totalCount, meta } = useDonations(filters, currentPage, pageSize)
 
   return (
     <DonationsErrorBoundary>
       <div className="space-y-6 animate-fade-in">
         <Heading level={1}>Donations</Heading>
 
-        {/* Stat Cards */}
+        {/* Stat Cards (Now using meta from useDonations) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard icon={CurrencyDollarIcon} title="Total Donations" value={stats.totalAmount} loading={statsLoading} error={statsError} />
-          <StatCard icon={BanknotesIcon} title="Via Bank" value={stats.viaBank} loading={statsLoading} error={statsError} />
-          <StatCard icon={CreditCardIcon} title="Via JazzCash" value={stats.viaJazzCash} loading={statsLoading} error={statsError} />
-          <StatCard icon={CreditCardIcon} title="Via Easypaisa" value={stats.viaEasypaisa} loading={statsLoading} error={statsError} />
+          <StatCard icon={CurrencyDollarIcon} title="Total Donations" value={meta.total_amount || 0} loading={loading} error={error} />
+          <StatCard icon={BanknotesIcon} title="Via Bank" value={meta.via_bank || 0} loading={loading} error={error} />
+          <StatCard icon={CreditCardIcon} title="Via JazzCash" value={meta.via_jazzcash || 0} loading={loading} error={error} />
+          <StatCard icon={CreditCardIcon} title="Via Easypaisa" value={meta.via_easypaisa || 0} loading={loading} error={error} />
         </div>
 
         {/* Filters */}
