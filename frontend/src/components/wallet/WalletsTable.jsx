@@ -9,7 +9,10 @@ import Switch from '../atoms/Switch';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import Drawer from '../molecules/Drawer';
-
+import React, { useEffect, useState } from 'react';
+import WalletsTable from './WalletsTable';
+import api from '@/services/api';
+import Skeleton from '../atoms/Skeleton';
 // Utility for human-readable datetime
 const formatDateTime = (iso) => {
   if (!iso) return '';
@@ -409,5 +412,29 @@ const sampleData = [
 ];
 
 export default function WalletsTableDemo() {
-  return <WalletsTable data={sampleData} />;
-} 
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    api.get('/api/wallet/admin/recipients/')
+      .then(res => {
+        // Pass raw data (WalletsTable will filter/search itself)
+        setData(res.data.results || []);
+      })
+      .catch(() => setData([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <Skeleton className="h-6 w-full mb-2" />
+        <Skeleton className="h-6 w-full mb-2" />
+        <Skeleton className="h-6 w-full mb-2" />
+      </div>
+    );
+  }
+
+  return <WalletsTable data={data} />;
+}
