@@ -79,7 +79,8 @@ urlpatterns = [
     path('api/debug/env/', debug_env, name='debug_env'),
 ]
 
-# Serve static and media files in development
-if settings.DEBUG:
+# Serve static and media files in development OR Railway
+if settings.DEBUG or os.environ.get("RAILWAY_ENVIRONMENT") == "production":
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
