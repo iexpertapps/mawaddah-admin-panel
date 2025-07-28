@@ -20,7 +20,7 @@ import { format } from 'date-fns'
 import { useNavigate } from 'react-router-dom'
 import Modal from '../../components/molecules/Modal'
 import { formatCurrencyShort } from '../../utils'
-import api from '../../api'
+import api from '@/api'   // ✅ Absolute import alias
 
 /* ----------------------- Error Boundary ----------------------- */
 class DonationsErrorBoundary extends React.Component {
