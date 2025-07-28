@@ -108,22 +108,22 @@ const useUserStats = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dataFetched, setDataFetched] = useState(false);
-
+//''
   useEffect(() => {
     if (!token || dataFetched) return;
     setLoading(true);
     setError(null);
     Promise.all([
-      fetch('/api/users/', {
+      fetch('../services/api/users/', {
         headers: { 'Authorization': `Token ${token}` }
       }).then(res => res.ok ? res.json() : { count: 0 }),
-      fetch('/api/users/?role=donor', {
+      fetch('../services/api/users/?role=donor', {
         headers: { 'Authorization': `Token ${token}` }
       }).then(res => res.ok ? res.json() : { count: 0 }),
-      fetch('/api/users/?role=recipient', {
+      fetch('../services/api/users/?role=recipient', {
         headers: { 'Authorization': `Token ${token}` }
       }).then(res => res.ok ? res.json() : { count: 0 }),
-      fetch('/api/users/?role=shura', {
+      fetch('../services/api/users/?role=shura', {
         headers: { 'Authorization': `Token ${token}` }
       }).then(res => res.ok ? res.json() : { count: 0 })
     ])
