@@ -415,7 +415,7 @@ export default function WalletsTableDemo() {
 
   useEffect(() => {
     setLoading(true);
-    api.get('/api/wallet/admin/recipients/')
+    api.get('/api/wallet/admin/overview/')
       .then(res => {
         // Pass raw data (WalletsTable will filter/search itself)
         setData(res.data.results || []);
