@@ -9,7 +9,6 @@ import Switch from '../atoms/Switch';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import Drawer from '../molecules/Drawer';
-import React, { useEffect, useState } from 'react';
 import WalletsTable from './WalletsTable';
 import api from '@/services/api';
 import Skeleton from '../atoms/Skeleton';
