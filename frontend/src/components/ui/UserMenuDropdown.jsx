@@ -2,11 +2,9 @@ import React, { Fragment } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { LogOut, User } from 'lucide-react';
 
-// ✅ Import fallback image
-import MawaddahLogo from '/ic_mawaddah_180x180.png';
-
 export default function UserMenuDropdown({ user, onLogout, onAccount }) {
-  const avatar = user?.avatar || MawaddahLogo;
+  // Root-relative path for fallback logo
+  const avatar = user?.avatar || '/ic_mawaddah_180x180.png';
 
   return (
     <Menu as="div" className="relative inline-block text-left">

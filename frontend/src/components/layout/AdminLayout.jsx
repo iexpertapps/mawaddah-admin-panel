@@ -15,8 +15,7 @@ import {
 import { Heading } from '../atoms/typography'
 import UserMenuDropdown from '../ui/UserMenuDropdown'
 
-// ✅ Import the image directly from public
-import MawaddahLogo from '/ic_mawaddah_180x180.png'
+
 
 // Sidebar component
 const Sidebar = () => {
@@ -34,7 +33,7 @@ const Sidebar = () => {
     <aside className="hidden lg:flex flex-col w-64 h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg">
       <div className="flex items-center h-20 px-6 border-b border-gray-200 dark:border-gray-700">
         <img
-          src={MawaddahLogo}
+          src= "/ic_mawaddah_180x180.png"
           alt="Mawaddah Logo"
           className="h-10 w-10 rounded-xl object-contain select-none"
           draggable="false"
