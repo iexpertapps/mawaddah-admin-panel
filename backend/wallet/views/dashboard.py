@@ -3,7 +3,6 @@ from datetime import timedelta
 
 from django.utils import timezone
 from django.db.models import Sum
-from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.response import Response
@@ -78,8 +77,8 @@ def get_recent_activities(start_date):
             "amount": None,
         })
 
-    # Withdrawals
-    for withdrawal in WalletTransaction.objects.filter(type="debit", created_at__gte=start_date).order_by("-created_at")[:5]:
+    # Withdrawals (FIX: use timestamp field)
+    for withdrawal in WalletTransaction.objects.filter(type="debit", timestamp__gte=start_date).order_by("-timestamp")[:5]:
         user_full_name = (
             getattr(withdrawal.wallet.user, "full_name", "Unknown")
             if withdrawal.wallet and withdrawal.wallet.user
@@ -91,7 +90,7 @@ def get_recent_activities(start_date):
             "title": "Withdrawal processed",
             "message": f"${withdrawal.amount} withdrawal processed",
             "user": user_full_name,
-            "timestamp": withdrawal.created_at.isoformat() if withdrawal.created_at else None,
+            "timestamp": withdrawal.timestamp.isoformat() if withdrawal.timestamp else None,
             "amount": float(withdrawal.amount),
         })
 
@@ -164,12 +163,13 @@ class ShuraSummaryView(APIView):
         try:
             total_withdrawals = WalletTransaction.objects.filter(type="debit").count()
 
-            recent_withdrawals = WalletTransaction.objects.filter(type="debit", created_at__isnull=False)
+            # FIX: use timestamp instead of created_at
+            recent_withdrawals = WalletTransaction.objects.filter(type="debit", timestamp__isnull=False)
             avg_processing_time_hours = 24 if recent_withdrawals.exists() else None  # Placeholder
 
             start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
             total_withdrawals_this_month = WalletTransaction.objects.filter(
-                type="debit", created_at__gte=start_of_month
+                type="debit", timestamp__gte=start_of_month
             ).count()
 
             return Response({
@@ -211,7 +211,8 @@ class WalletStatsView(APIView):
             if not wallet:
                 return Response({"error": "Wallet not found"}, status=404)
 
-            recent_transactions = WalletTransaction.objects.filter(wallet=wallet).order_by("-created_at")[:10]
+            # FIX: order by timestamp instead of created_at
+            recent_transactions = WalletTransaction.objects.filter(wallet=wallet).order_by("-timestamp")[:10]
 
             total_credited = WalletTransaction.objects.filter(wallet=wallet, type="credit").aggregate(
                 total=Sum("amount")
@@ -231,7 +232,7 @@ class WalletStatsView(APIView):
                         "type": transaction.type,
                         "amount": float(transaction.amount),
                         "description": transaction.description,
-                        "created_at": transaction.created_at.isoformat() if transaction.created_at else None,
+                        "timestamp": transaction.timestamp.isoformat() if transaction.timestamp else None,
                     }
                     for transaction in recent_transactions
                 ]
