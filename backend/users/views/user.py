@@ -1,3 +1,4 @@
+from datetime import timedelta
 from rest_framework import viewsets, mixins, status, permissions
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -226,8 +227,7 @@ class ChangePasswordView(APIView):
         user.save()
         return Response({'success': True, 'message': 'Password changed successfully.'}, status=status.HTTP_200_OK) 
     
-
-    class SendOtpView(APIView):
+class SendOtpView(APIView):
      def post(self, request):
         email = request.data.get("email")
         if not email:
@@ -252,8 +252,8 @@ class ChangePasswordView(APIView):
         )
 
         return Response({"success": True, "message": "OTP sent to email"})
-     
-     class VerifyOtpView(APIView):
+        
+class VerifyOtpView(APIView):
       def post(self, request):
         email = request.data.get("email")
         otp = request.data.get("otp")
