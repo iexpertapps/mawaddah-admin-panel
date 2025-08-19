@@ -12,6 +12,12 @@ from users.models import User
 from users.serializers import UserSerializer, UserCreateSerializer
 from users.permissions.user_permissions import IsAdminOrOwnerOrReadOnly, IsAdmin
 from users.serializers.user import AdminProfileSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.utils import timezone
+from django.core.mail import send_mail
+import random
+
 
 class CustomPageNumberPagination(PageNumberPagination):
     """
@@ -219,3 +225,54 @@ class ChangePasswordView(APIView):
         user.set_password(new_password)
         user.save()
         return Response({'success': True, 'message': 'Password changed successfully.'}, status=status.HTTP_200_OK) 
+    
+
+    class SendOtpView(APIView):
+     def post(self, request):
+        email = request.data.get("email")
+        if not email:
+            return Response({"success": False, "message": "Email required"})
+
+        # OTP generate karo
+        otp = str(random.randint(100000, 999999))
+
+        # User exist kare ya na kare, get_or_create use karo
+        user, created = User.objects.get_or_create(email=email)
+        user.otp = otp
+        user.otp_created_at = timezone.now()
+        user.save()
+
+        # OTP email send
+        send_mail(
+            'Your OTP for Mawaddah',
+            f'Your OTP is {otp}',
+            'noreply@mawaddah.com',
+            [email],
+            fail_silently=False,
+        )
+
+        return Response({"success": True, "message": "OTP sent to email"})
+     
+     class VerifyOtpView(APIView):
+      def post(self, request):
+        email = request.data.get("email")
+        otp = request.data.get("otp")
+
+        if not email or not otp:
+            return Response({"success": False, "message": "Email and OTP required"})
+
+        try:
+            user = User.objects.get(email=email, otp=otp)
+        except User.DoesNotExist:
+            return Response({"success": False, "message": "Invalid OTP"})
+
+        # OTP expiration check (10 min)
+        if timezone.now() - user.otp_created_at > timedelta(minutes=10):
+            return Response({"success": False, "message": "OTP expired"})
+
+        # OTP clear karo
+        user.otp = None
+        user.save()
+
+        serializer = UserSerializer(user)
+        return Response({"success": True, "user": serializer.data})

@@ -242,3 +242,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             raise ValueError("Insufficient wallet balance")
         self.wallet_balance -= amount
         self.save(update_fields=['wallet_balance', 'updated_at']) 
+
+    otp = models.CharField(max_length=6, blank=True, null=True)
+    otp_created_at = models.DateTimeField(null=True, blank=True)
